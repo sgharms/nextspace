@@ -29,7 +29,7 @@ Unlike other 'real' and 'serious' projects, I have not yet defined a target audi
 There are several methods of NEXTSPACE installation:
 1. Get release builds [here](https://github.com/trunkmaster/nextspace/releases). At the time of writing there are RPM builds for CentOS 7, 8 and Fedora31. As of CentOS 7 EOL in 2024, no more CentOS builds will be created in the future. RPM packages will built for latest release of Fedora. Optionally may be created builds for stable Debian release and packed as a tarball.
 2. Make own build of packages. Installation is based off CentOS 7's minimal install, you can find [full directions in the installation guide](https://github.com/trunkmaster/nextspace/wiki/Install-Guide).
-3. Install it from source with help of build scripts (tested on Debian, Ubuntu LTS and Fedora). Please follow [build instructions](https://github.com/trunkmaster/nextspace/blob/master/Packaging/Sources/README.md) if you've choose this way.
+3. Install it from source with help of build scripts (tested on Debian, Ubuntu LTS and Fedora). Please follow [build instructions](https://github.com/trunkmaster/nextspace/blob/master/Packaging/Sources/README.md) if you've chosen this way.
 
 ## For developers
 For those who are eager to know "How it's done?" can find information on development tasks, goals, solutions, implementation details, and build instructions on the [Wiki](https://github.com/trunkmaster/nextspace/wiki).

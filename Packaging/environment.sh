@@ -48,7 +48,7 @@ MACHINE=`uname -m`
 if [ -f /proc/device-tree/model ];then
 	MODEL=`cat /proc/device-tree/model | awk '{print $1}'`
 else
-	MODEL="unkown"
+	MODEL="unknown"
 fi
 
 if [ -f /proc/device-tree/compatible ];then
