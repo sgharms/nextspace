@@ -6,7 +6,6 @@ BUILD_TOOLS="
 "
 #--- libdispatch, libcorefoundation, libobjc2
 RUNTIME_DEPS="
-    libbsd-dev
     uuid-dev
     libcurl4-gnutls-dev
     libavahi-compat-libdnssd-dev
