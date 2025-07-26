@@ -1,7 +1,6 @@
 # FreeBSD Config
 
 BUILD_TOOLS="
-    curl
     clang
     cmake
     git
