@@ -32,6 +32,19 @@ if [ ! -d ${BUILD_ROOT}/${GIT_PKG_NAME} ]; then
 	curl -L https://github.com/swiftlang/swift-corelibs-libdispatch/archive/refs/tags/swift-${libdispatch_version}-RELEASE.tar.gz -o ${BUILD_ROOT}/${GIT_PKG_NAME}.tar.gz
 	cd ${BUILD_ROOT}
 	tar zxf ${GIT_PKG_NAME}.tar.gz
+  if [ $IS_FREEBSD ]; then
+    cd ${GIT_PKG_NAME}
+    if [ -z "${LIBDISPATCH_PATCHES_DIR}" ]; then
+      echo "Applying FreeBSD-specific patches"
+      LIBDISPATCH_PATCHES_DIR="/usr/ports/lang/swift$(echo $libdispatch_version | tr -d '.')/files"
+      _LIBDISPATCH_PATCHES=$(echo $LIBDISPATCH_PATCHES | sed 's/\n/\ /g')
+      for patchfile in $_LIBDISPATCH_PATCHES; do
+        fp="$LIBDISPATCH_PATCHES_DIR/$patchfile"
+        echo "Applying ${fp}"
+        patch -p1 < $fp
+      done
+    fi
+  fi
 	cd ..
 fi
 

@@ -8,6 +8,20 @@ BUILD_TOOLS="
 #--- libdispatch, libcorefoundation, libobjc2
 RUNTIME_DEPS="
 "
+#--- Patches required to update the source to compile. Taken from the Swift 5.10 package
+LIBDISPATCH_PATCHES="
+    patch-swift-corelibs-libdispatch_src_shims_lock.c \
+    patch-swift-corelibs-libdispatch_src_shims_lock.h \
+    patch-swift-corelibs-libdispatch_src_queue.c \
+    patch-swift-corelibs-libdispatch_src_apply.c \
+    patch-swift-corelibs-libdispatch_src_data.c \
+    patch-swift-corelibs-libdispatch_src_init.c \
+    patch-swift-corelibs-libdispatch_src_io.c \
+    patch-swift-corelibs-libdispatch_src_event_event__config.h \
+    patch-swift-corelibs-libdispatch_src_event_event__kevent.c \
+    patch-swift-corelibs-libdispatch_src_event_workqueue.c \
+    patch-swift-corelibs-libdispatch_src_event_workqueue__internal.h
+"
 #--- gnustep-make
 GNUSTEP_MAKE_DEPS="
     zsh
