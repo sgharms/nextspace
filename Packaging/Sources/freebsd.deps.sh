@@ -3,12 +3,10 @@
 BUILD_TOOLS="
     cmake
     git
+    ninja
 "
 #--- libdispatch, libcorefoundation, libobjc2
 RUNTIME_DEPS="
-    uuid-dev
-    libcurl4-gnutls-dev
-    libavahi-compat-libdnssd-dev
 "
 #--- gnustep-make
 GNUSTEP_MAKE_DEPS="

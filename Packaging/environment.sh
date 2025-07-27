@@ -1,14 +1,25 @@
 ###############################################################################
 # Variables
 ###############################################################################
-ECHO="/usr/bin/echo -e"
 _PWD=`pwd`
+# Prefer doas(1) to sudo(1)
+#
+if [ $(id -u) = 0 ]; then
+  PRIV_CMD=""
+else
+  if [ -e "/usr/local/etc/doas.conf" ]; then
+    PRIV_CMD="doas"
+  else
+    PRIV_CMD="sudo"
+  fi
+fi
+export PRIV_CMD
 
 #----------------------------------------
 # Libraries and applications
 #----------------------------------------
 # Apple
-libdispatch_version=5.9.2
+libdispatch_version=5.10
 libcorefoundation_version=5.9.2
 libcfnetwork_version=129.20
 # GNUstep
@@ -39,7 +50,7 @@ if [ -n "${_VER}" ] && [ "${_VER}" != " " ]; then
 fi
 # Name like "Fedora Linux"
 OS_NAME=$NAME
-${ECHO} "OS:\t\t${OS_ID}-${OS_VERSION}"
+printf "OS:\t\t%s-%s\n" $OS_ID $OS_VERSION
 
 #---------------------------------------
 # Machine
@@ -63,19 +74,23 @@ fi
 # Directory where nextspace GitHub repo resides
 cd ../..
 PROJECT_DIR=`pwd`
-${ECHO} "NextSpace repo:\t${PROJECT_DIR}"
+printf "NextSpace repo:\t%s\n" $PROJECT_DIR
 cd ${_PWD}
 
 if [ -z $BUILD_RPM ]; then
-  BUILD_ROOT="${_PWD}/BUILD_ROOT"
+  if [ -z $BUILD_ROOT ]; then
+    # Environment variables take precedence
+    export BUILD_ROOT="${_PWD}/BUILD_ROOT"
+  fi
   if [ ! -d ${BUILD_ROOT} ]; then
     mkdir ${BUILD_ROOT}
   fi
-  ${ECHO} "Build in:\t${BUILD_ROOT}"
+
+  printf "Build in:\t%s\n" $BUILD_ROOT
 
   if [ "$1" != "" ];then
     DEST_DIR=${1}
-    ${ECHO} "Install in:\t${1}"
+    printf "Install in:\t%s\n" $DEST_DIR
   else
     DEST_DIR=""
   fi
@@ -92,7 +107,7 @@ else
   mkdir -p $RPM_SOURCES_DIR
   mkdir -p $RPM_SPECS_DIR
 
-  ${ECHO} "RPMs directory:\t$RPMS_DIR"
+  printf "RPMs directory:\t%s\n" $RPMS_DIR
 fi
 
 . ../functions.sh
@@ -101,6 +116,10 @@ fi
 #----------------------------------------
 if [ ${OS_ID} = "debian" ] || [ ${OS_ID} = "ubuntu" ]; then
     . ./${OS_ID}-${OS_VERSION}.deps.sh || exit 1
+elif [ "${OS_ID}" = "freebsd" ]; then
+    . ./${OS_ID}.deps.sh
+    export IS_FREEBSD=1
+    export ECHO="printf "%s\n""
 else
     prepare_redhat_environment
 fi
@@ -119,7 +138,7 @@ fi
 if [ "$1" != "" ];then
   INSTALL_CMD="${MAKE_CMD} install DESTDIR=${1}"
 else
-  INSTALL_CMD="sudo -E ${MAKE_CMD} install"
+  INSTALL_CMD="${PRIV_CMD} -E ${MAKE_CMD} install"
 fi
 
 # Utilities
@@ -130,32 +149,38 @@ if [ "$1" != "" ];then
   CP_CMD="cp -R"
   MKDIR_CMD="mkdir -p"
 else
-  RM_CMD="sudo rm"
-  LN_CMD="sudo ln -sf"
-  MV_CMD="sudo mv -v"
-  CP_CMD="sudo cp -R"
-  MKDIR_CMD="sudo mkdir -p"
+  RM_CMD="${PRIV_CMD} rm"
+  LN_CMD="${PRIV_CMD} ln -sf"
+  MV_CMD="${PRIV_CMD} mv -v"
+  CP_CMD="${PRIV_CMD} cp -R"
+  MKDIR_CMD="${PRIV_CMD} mkdir -p"
 fi
 
 # Linker
-ld -v | grep "gold" 2>&1 > /dev/null
-if [ "$?" = "1" ]; then
-  ${ECHO} "Setting up Gold linker..."
-  sudo update-alternatives --install /usr/bin/ld ld /usr/bin/ld.gold 100
-  sudo update-alternatives --install /usr/bin/ld ld /usr/bin/ld.bfd 10
-  sudo update-alternatives --auto ld
+if [ "${OS_ID}" != "freebsd" ]; then
   ld -v | grep "gold" 2>&1 > /dev/null
   if [ "$?" = "1" ]; then
-    ${ECHO} "Failed to setup Gold linker"
-    exit 1
+    echo "Setting up Gold linker..."
+    sudo update-alternatives --install /usr/bin/ld ld /usr/bin/ld.gold 100
+    sudo update-alternatives --install /usr/bin/ld ld /usr/bin/ld.bfd 10
+    sudo update-alternatives --auto ld
+    ld -v | grep "gold" 2>&1 > /dev/null
+    if [ "$?" = "1" ]; then
+      echo "Failed to setup Gold linker"
+      exit 1
+    fi
   fi
+elif [ "${OS_ID}" = "freebsd" ]; then
+  printf "Using linker:\t%s\n" "$(ld --version)"
+  printf "\t\tPer ld.lld(1): \"...drop-in replacement for the GNU BFD and gold linkers\""
 else
-  ${ECHO} "Using linker:\tGold"
+  printf "Using linker:\t%s\n" Gold
 fi
+
 # Compiler
-if [ "$OS_ID" = "fedora" ] || [ "$OS_LIKE" = "rhel" ] || [ "$OS_ID" = "debian" ] || [ "$OS_ID" = "ubuntu" ] || [ "$OS_ID" = "ultramarine" ]; then
+if [ "$OS_ID" = "fedora" ] || [ "$OS_LIKE" = "rhel" ] || [ "$OS_ID" = "debian" ] || [ "$OS_ID" = "ubuntu" ] || [ "$OS_ID" = "ultramarine" ] || [ "$OS_ID" = "freebsd" ]; then
   which clang 2>&1 > /dev/null || { echo "No clang compiler found. Please install clang package."; exit 1; }
-  C_COMPILER=`which clang`
+  export C_COMPILER=`which clang`
   which clang++ 2>&1 > /dev/null || { echo "No clang++ compiler found. Please install clang++ package."; exit 1; }
-  CXX_COMPILER=`which clang++`
+  export CXX_COMPILER=`which clang++`
 fi
