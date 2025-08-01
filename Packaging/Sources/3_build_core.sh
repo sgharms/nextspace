@@ -10,6 +10,14 @@ CORE_SOURCES=${PROJECT_DIR}/Core/os_files
 # /.hidden
 $CP_CMD ${CORE_SOURCES}/dot_hidden /.hidden
 
+if ! [ -z $IS_FREEBSD ]; then
+  if ! [ "$DEST_DIR" = "/usr/local" ]; then
+    printf "%sYou are on FreeBSD and don't have DEST_DIR set to '/usr/local'. This is almost certainly a mistake\n%s" $(tput af yellow) $(tput sgr0)
+    printf "Use ^C to abort and reinvoke with \"DEST_DIR=/usr/local\". Otherwise, press enter to continue. \n ";
+    read FU
+  fi
+fi
+
 # Preferences
 $MKDIR_CMD $DEST_DIR/Library/Preferences
 $CP_CMD ${CORE_SOURCES}/Library/Preferences/* $DEST_DIR/Library/Preferences/

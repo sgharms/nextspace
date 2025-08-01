@@ -92,7 +92,10 @@ if [ -z $BUILD_RPM ]; then
     DEST_DIR=${1}
     printf "Install in:\t%s\n" $DEST_DIR
   else
-    DEST_DIR=""
+    # Allow for setting via environment
+    if [ -z "$DEST_DIR" ]; then
+      DEST_DIR=""
+    fi
   fi
 else
   print_H2 "===== Create rpmbuild directories..."
