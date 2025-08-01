@@ -5,7 +5,7 @@
 #----------------------------------------
 # Install package dependecies
 #----------------------------------------
-if [ ${OS_ID} != "debian" ] && [ ${OS_ID} != "ubuntu" ]; then
+if [ ${OS_ID} != "debian" ] && [ ${OS_ID} != "ubuntu" ] && [ ${OS_ID} != "freebsd" ]; then
 	${ECHO} ">>> Installing ${OS_ID} packages for ObjC 2.0 runtime build"
 	${ECHO} "RedHat-based Linux distribution: calling 'yum -y install'."
 	SPEC_FILE=${PROJECT_DIR}/Libraries/libobjc2/libobjc2.spec
