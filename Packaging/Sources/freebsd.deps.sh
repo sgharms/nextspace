@@ -3,6 +3,7 @@
 BUILD_TOOLS="
     cmake
     git
+    gmake
     ninja
     pkgconf
 "
@@ -56,15 +57,7 @@ RUNTIME_RUN_DEPS="
 "
 #--- libwraster
 WRASTER_DEPS="
-    libgif-dev
-    libjpeg-dev
-    libpng-dev
-    libtiff-dev
-    libwebp-dev
-    libxpm-dev
-    libxmu-dev
-    libxext-dev
-    libx11-dev
+  GraphicsMagick
 "
 WRASTER_RUN_DEPS="
     libgif7

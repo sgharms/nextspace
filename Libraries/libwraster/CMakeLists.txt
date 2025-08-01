@@ -40,7 +40,7 @@ find_package(GraphicsMagick COMPONENTS MagickWand)
 if (GraphicsMagick_FOUND)
   set(USE_MAGICK 1)
   set(MAGICK_INCLUDES -I${GraphicsMagick_INCLUDE_DIRS})
-  set(MAGICK_LIBS -l${GraphicsMagick_LIBRARIES})
+  set(MAGICK_LIBS ${GraphicsMagick_LIBRARIES})
 endif()
 
 check_include_files("png.h" USE_PNG)
