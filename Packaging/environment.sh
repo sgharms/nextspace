@@ -138,7 +138,7 @@ fi
 if [ "$1" != "" ];then
   INSTALL_CMD="${MAKE_CMD} install DESTDIR=${1}"
 else
-  INSTALL_CMD="${PRIV_CMD} -E ${MAKE_CMD} install"
+  INSTALL_CMD="${PRIV_CMD} ${PRIV_CMD:+ -E} ${MAKE_CMD} install"
 fi
 
 # Utilities
