@@ -133,7 +133,7 @@ fi
 # Make
   CMAKE_CMD=cmake
 if type "gmake" 2>/dev/null >/dev/null ;then
-  MAKE_CMD="gmake -j8"
+  MAKE_CMD="gmake -j8 "
 else
   MAKE_CMD="make -j8 "
 fi
