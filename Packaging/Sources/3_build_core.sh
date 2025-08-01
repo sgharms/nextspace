@@ -41,10 +41,14 @@ if ! [ -d $DEST_DIR/etc/polkit-1/rules.d ];then
 	$MKDIR_CMD -v $DEST_DIR/etc/polkit-1/rules.d
 fi
 $CP_CMD ${CORE_SOURCES}/etc/polkit-1/rules.d/*.rules $DEST_DIR/etc/polkit-1/rules.d/
-if ! [ -d $DEST_DIR/etc/udev/rules.d ];then
-	$MKDIR_CMD -v $DEST_DIR/etc/udev/rules.d
+
+if ! [ $IS_FREEBSD ]; then
+  # FreeBSD uses `devd`
+  if ! [ -d $DEST_DIR/etc/udev/rules.d ];then
+    $MKDIR_CMD -v $DEST_DIR/etc/udev/rules.d
+  fi
+  $CP_CMD ${CORE_SOURCES}/etc/udev/rules.d/*.rules $DEST_DIR/etc/udev/rules.d/
 fi
-$CP_CMD ${CORE_SOURCES}/etc/udev/rules.d/*.rules $DEST_DIR/etc/udev/rules.d/
 
 # User environment
 if ! [ -d $DEST_DIR/etc/profile.d ];then
