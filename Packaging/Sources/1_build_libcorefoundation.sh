@@ -9,6 +9,8 @@ ${ECHO} ">>> Installing ${OS_ID} packages for CoreFoundation library build"
 if [ ${OS_ID} = "debian" ] || [ ${OS_ID} = "ubuntu" ]; then
 	${ECHO} "Debian-based Linux distribution: calling 'apt-get install'."
 	sudo apt-get install -y ${RUNTIME_DEPS} || exit 1
+elif [ "${OS_ID}" = "freebsd" ]; then
+  ${PRIV_CMD} pkg install ${RUNTIME_DEPS}
 else
 	${ECHO} ">>> Installing ${OS_ID} packages for CoreFoundation build"
 	${ECHO} "RedHat-based Linux distribution: calling 'yum -y install'."
