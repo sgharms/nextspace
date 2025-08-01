@@ -30,10 +30,10 @@ $CP_CMD -v ${CORE_SOURCES}/etc/ld.so.conf.d/nextspace.conf $DEST_DIR/etc/ld.so.c
 sudo ldconfig
 
 # X11
-#if ! [ -d $DEST_DIR/etc/X11/xorg.conf.d ];then
-#	$MKDIR_CMD -v $DEST_DIR/etc/X11/xorg.conf.d
-#fi
-#$CP_CMD ${CORE_SOURCES}/etc/X11/xorg.conf.d/*.conf $DEST_DIR/etc/X11/xorg.conf.d/
+# We've not yet installed the X ecosystem, test for presence.
+if ! [ -d "$DEST_DIR/etc/X11" ]; then
+  $MKDIR_CMD "$DEST_DIR/etc/X11"
+fi
 $CP_CMD ${CORE_SOURCES}/etc/X11/Xresources.nextspace $DEST_DIR/etc/X11
 
 # PolKit & udev
