@@ -37,6 +37,19 @@ fi
 #----------------------------------------
 # CoreFoundation
 cd ${BUILD_ROOT}/${CF_PKG_NAME} || exit 1
+if [ $IS_FREEBSD ]; then
+  echo "Applying FreeBSD-specific patches"
+  if [ -z "${LIBCOREFOUNDATION_PATCHES_DIR}" ]; then
+    LIBCOREFOUNDATION_PATCHES_DIR="/usr/ports/lang/swift$(echo $libcorefoundation_version | tr -d '.')/files"
+  fi
+  _LIBCOREFOUNDATION_PATCHES=$(echo $LIBCOREFOUNDATION_PATCHES | sed 's/\n/\ /g')
+  for patchfile in $_LIBCOREFOUNDATION_PATCHES; do
+    fp="$LIBCOREFOUNDATION_PATCHES_DIR/$patchfile"
+    echo "Applying ${fp}"
+    patch -p2 < $fp
+  done
+  patch -p0 < "${OLDPWD}/patches/patch-libcorefoundation-RunLoop.subproj-CFFileDescriptor.h"
+fi
 rm -rf .build 2>/dev/null
 mkdir -p .build
 cd .build
