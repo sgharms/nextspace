@@ -10,7 +10,7 @@ if [ "${OS_ID}" = "debian" ] || [ "${OS_ID}" = "ubuntu" ]; then
 	${ECHO} "Debian-based Linux distribution: calling 'apt-get install'."
 	sudo apt-get install -q -y ${BUILD_TOOLS} ${RUNTIME_DEPS} || exit 1
 elif [ "${OS_ID}" = "freebsd" ]; then
-  ${PRIV_CMD} pkg install ${BUILD_TOOLS}
+  ${PRIV_CMD} pkg install ${BUILD_TOOLS} ${RUNTIME_DEPS}
 else
 	if [ "${OS_ID}" = "fedora" ] || [ "$OS_ID" = "ultramarine" ]; then
 		${ECHO} "No need to build - installing 'libdispatch-devel' from Fedora repository..."
