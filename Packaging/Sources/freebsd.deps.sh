@@ -4,9 +4,16 @@ BUILD_TOOLS="
     cmake
     git
     ninja
+    pkgconf
 "
 #--- libdispatch, libcorefoundation, libobjc2
 RUNTIME_DEPS="
+ftp/curl \
+devel/icu \
+misc/libuuid \
+textproc/libxml2 \
+archivers/zstd \
+avahi-libdns
 "
 #--- Patches required to update the source to compile. Taken from the Swift 5.10 package
 LIBDISPATCH_PATCHES="
@@ -22,6 +29,15 @@ LIBDISPATCH_PATCHES="
     patch-swift-corelibs-libdispatch_src_event_workqueue.c \
     patch-swift-corelibs-libdispatch_src_event_workqueue__internal.h
 "
+
+LIBCOREFOUNDATION_PATCHES="
+  patch-swift-corelibs-foundation_CoreFoundation_Base.subproj_CFPlatform.c \
+  patch-swift-corelibs-foundation_CoreFoundation_Base.subproj_CoreFoundation__Prefix.h \
+  patch-swift-corelibs-foundation_CoreFoundation_NumberDate.subproj_CFDate.c \
+  patch-swift-corelibs-foundation_CoreFoundation_PlugIn.subproj_CFBundle__Internal.h \
+  patch-swift-corelibs-foundation_CoreFoundation_RunLoop.subproj_CFRunLoop.c
+"
+
 #--- gnustep-make
 GNUSTEP_MAKE_DEPS="
     zsh

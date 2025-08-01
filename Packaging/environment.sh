@@ -20,7 +20,7 @@ export PRIV_CMD
 #----------------------------------------
 # Apple
 libdispatch_version=5.10
-libcorefoundation_version=5.9.2
+libcorefoundation_version=5.10
 libcfnetwork_version=129.20
 # GNUstep
 libobjc2_version=2.2.1

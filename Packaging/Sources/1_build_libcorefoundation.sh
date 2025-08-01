@@ -57,7 +57,7 @@ C_FLAGS="-I/usr/NextSpace/include -Wno-switch -Wno-enum-conversion"
 $CMAKE_CMD .. \
 	-DCMAKE_C_COMPILER=${C_COMPILER} \
 	-DCMAKE_C_FLAGS="${C_FLAGS}" \
-	-DCMAKE_SHARED_LINKER_FLAGS="-L/usr/NextSpace/lib -luuid" \
+	-DCMAKE_SHARED_LINKER_FLAGS="-L/usr/NextSpace/lib -L/usr/local/lib -luuid" \
 	-DCF_DEPLOYMENT_SWIFT=NO \
 	-DBUILD_SHARED_LIBS=YES \
 	-DCMAKE_INSTALL_PREFIX=/usr/NextSpace \
@@ -76,11 +76,11 @@ if [ -n  "$libcfnetwork_version" ]; then
 	rm -rf .build 2>/dev/null
 	mkdir -p .build
 	cd .build
-	CFN_CFLAGS="-F../../${CF_PKG_NAME}/.build -I/usr/NextSpace/include"
-	CFN_LD_FLAGS="-L/usr/NextSpace/lib -L../../${CF_PKG_NAME}/.build/CoreFoundation.framework"
+	CFN_CFLAGS="-F../../${CF_PKG_NAME}/.build -I/usr/NextSpace/include -I/usr/local/include/avahi-compat-libdns_sd"
+	CFN_LD_FLAGS="-L/usr/NextSpace/lib\ -L../../${CF_PKG_NAME}/.build/CoreFoundation.framework -lavahi-compat-libdns_sd"
 	cmake .. \
 		-DCMAKE_C_COMPILER=${C_COMPILER} \
-		-DCMAKE_CXX_COMPILER=clang++ \
+		-DCMAKE_CXX_COMPILER=${CXX_COMPILER} \
 		-DCFNETWORK_CFLAGS="${CFN_CFLAGS}" \
 		-DCFNETWORK_LDLAGS="${CFN_LD_FLAGS}" \
 		-DBUILD_SHARED_LIBS=YES \
@@ -143,5 +143,5 @@ if [ -n  "$libcfnetwork_version" ]; then
 fi
 
 if [ "$DEST_DIR" = "" ]; then
-	sudo ldconfig
+	$PRIV_CMD ldconfig
 fi
