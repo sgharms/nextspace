@@ -82,7 +82,7 @@ if [ -n  "$libcfnetwork_version" ]; then
 	mkdir -p .build
 	cd .build
 	CFN_CFLAGS="-F../../${CF_PKG_NAME}/.build -I/usr/NextSpace/include -I/usr/local/include/avahi-compat-libdns_sd"
-	CFN_LD_FLAGS="-L/usr/NextSpace/lib\ -L../../${CF_PKG_NAME}/.build/CoreFoundation.framework -lavahi-compat-libdns_sd"
+	CFN_LD_FLAGS="-L/usr/NextSpace/lib -L../../${CF_PKG_NAME}/.build/CoreFoundation.framework -L/usr/local/lib -ldns_sd -lCoreFoundation"
 	cmake .. \
 		-DCMAKE_C_COMPILER=${C_COMPILER} \
 		-DCMAKE_CXX_COMPILER=${CXX_COMPILER} \
