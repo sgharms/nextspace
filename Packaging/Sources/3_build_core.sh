@@ -70,13 +70,27 @@ $CP_CMD ${CORE_SOURCES}/etc/skel/.config /root
 $CP_CMD ${CORE_SOURCES}/etc/skel/Library /root
 
 # Scripts
-if ! [ -d $DEST_DIR/usr/NextSpace/bin ];then
-	$MKDIR_CMD -v $DEST_DIR/usr/NextSpace/bin
-fi
-$CP_CMD ${CORE_SOURCES}/usr/NextSpace/bin/* $DEST_DIR/usr/NextSpace/bin/
+if [ $IS_FREEBSD ]; then
+  if ! [ -d $DEST_DIR/NextSpace/bin ];then
+    $MKDIR_CMD -v $DEST_DIR/NextSpace/bin
+  fi
+  $CP_CMD ${CORE_SOURCES}/usr/NextSpace/bin/* $DEST_DIR/NextSpace/bin/
 
-# Icons, Plymouth resources and fontconfig configuration
-if ! [ -d $DEST_DIR/usr/share ];then
-	$MKDIR_CMD -v $DEST_DIR/usr/share
+  # Icons, Plymouth resources and fontconfig configuration
+  if ! [ -d $DEST_DIR/share ]; then
+    $MKDIR_CMD -v $DEST_DIR/share
+  fi
+  $CP_CMD ${CORE_SOURCES}/usr/share/* $DEST_DIR/share/
+else
+
+  if ! [ -d $DEST_DIR/usr/NextSpace/bin ];then
+    $MKDIR_CMD -v $DEST_DIR/usr/NextSpace/bin
+  fi
+  $CP_CMD ${CORE_SOURCES}/usr/NextSpace/bin/* $DEST_DIR/usr/NextSpace/bin/
+
+  # Icons, Plymouth resources and fontconfig configuration
+  if ! [ -d $DEST_DIR/usr/share ];then
+    $MKDIR_CMD -v $DEST_DIR/usr/share
+  fi
+  $CP_CMD ${CORE_SOURCES}/usr/share/* $DEST_DIR/usr/share/
 fi
-$CP_CMD ${CORE_SOURCES}/usr/share/* $DEST_DIR/usr/share/

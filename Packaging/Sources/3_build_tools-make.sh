@@ -9,6 +9,8 @@ ${ECHO} ">>> Installing ${OS_ID} packages for GNUstep Make build"
 if [ ${OS_ID} = "debian" ] || [ ${OS_ID} = "ubuntu" ]; then
 	${ECHO} "Debian-based Linux distribution: calling 'apt-get install'."
 	sudo apt-get install -y ${GNUSTEP_MAKE_DEPS} || exit 1
+elif [ $IS_FREEBSD ]; then
+  ${ECHO} "FreeBSD is easy like Sunday morning"
 else
 	${ECHO} "RedHat-based Linux distribution: calling 'yum -y install'."
 	SPEC_FILE=${PROJECT_DIR}/Core/nextspace-core.spec
