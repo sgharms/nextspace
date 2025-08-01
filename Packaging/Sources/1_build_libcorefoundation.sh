@@ -29,7 +29,12 @@ if [ ! -d ${BUILD_ROOT}/${CF_PKG_NAME} ]; then
     git clone --depth 1 https://github.com/trunkmaster/apple-corefoundation ${BUILD_ROOT}/${CF_PKG_NAME}
 fi
 if [ ! -d ${BUILD_ROOT}/${CFNET_PKG_NAME} ]; then
-    git clone --depth 1 https://github.com/trunkmaster/apple-cfnetwork ${BUILD_ROOT}/${CFNET_PKG_NAME}
+    TESTDIR="/root/wip" 
+    if [ -d "$TESTDIR" ]; then
+      cp -r $TESTDIR ${BUILD_ROOT}/${CFNET_PKG_NAME}
+    else
+      git clone --depth 1 https://github.com/trunkmaster/apple-cfnetwork ${BUILD_ROOT}/${CFNET_PKG_NAME}
+    fi
 fi
 
 #----------------------------------------
