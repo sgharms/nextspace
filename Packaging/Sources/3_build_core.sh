@@ -27,7 +27,7 @@ if ! [ -d $DEST_DIR/etc/ld.so.conf.d ];then
 	$MKDIR_CMD -v $DEST_DIR/etc/ld.so.conf.d
 fi
 $CP_CMD -v ${CORE_SOURCES}/etc/ld.so.conf.d/nextspace.conf $DEST_DIR/etc/ld.so.conf.d/
-sudo ldconfig
+$PRIV_CMD ldconfig
 
 # X11
 # We've not yet installed the X ecosystem, test for presence.
