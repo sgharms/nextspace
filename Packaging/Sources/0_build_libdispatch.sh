@@ -33,17 +33,17 @@ if [ ! -d ${BUILD_ROOT}/${GIT_PKG_NAME} ]; then
 	cd ${BUILD_ROOT}
 	tar zxf ${GIT_PKG_NAME}.tar.gz
   if [ $IS_FREEBSD ]; then
+    echo "Applying FreeBSD-specific patches"
     cd ${GIT_PKG_NAME}
     if [ -z "${LIBDISPATCH_PATCHES_DIR}" ]; then
-      echo "Applying FreeBSD-specific patches"
       LIBDISPATCH_PATCHES_DIR="/usr/ports/lang/swift$(echo $libdispatch_version | tr -d '.')/files"
-      _LIBDISPATCH_PATCHES=$(echo $LIBDISPATCH_PATCHES | sed 's/\n/\ /g')
-      for patchfile in $_LIBDISPATCH_PATCHES; do
-        fp="$LIBDISPATCH_PATCHES_DIR/$patchfile"
-        echo "Applying ${fp}"
-        patch -p1 < $fp
-      done
     fi
+    _LIBDISPATCH_PATCHES=$(echo $LIBDISPATCH_PATCHES | sed 's/\n/\ /g')
+    for patchfile in $_LIBDISPATCH_PATCHES; do
+      fp="$LIBDISPATCH_PATCHES_DIR/$patchfile"
+      echo "Applying ${fp}"
+      patch -p1 < $fp
+    done
   fi
 	cd ..
 fi
