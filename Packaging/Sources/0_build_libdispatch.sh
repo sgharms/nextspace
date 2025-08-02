@@ -12,8 +12,8 @@ if [ "${OS_ID}" = "debian" ] || [ "${OS_ID}" = "ubuntu" ]; then
 elif [ "${OS_ID}" = "freebsd" ]; then
   ${PRIV_CMD} pkg install ${BUILD_TOOLS} ${RUNTIME_DEPS}
   if ! [ "$DEST_DIR" = "/usr/local" ]; then
-    printf "%sYou are on FreeBSD and don't have DEST_DIR set to '/usr/local'. This is almost certainly a mistake\n%s" $(tput setaf 226) $(tput sgr0)
-    printf "Use ^C to abort and reinvoke with \"DEST_DIR=/usr/local\". Otherwise, press enter to continue. \n ";
+    printf "%sYou are on FreeBSD and don't have DEST_DIR set to '/usr/local'. This is almost certainly a mistake.\n%s" $(tput setaf 226) $(tput sgr0)
+    printf "%sUse ^C to abort and reinvoke with \"DEST_DIR=/usr/local\". Otherwise, press enter to continue.\n%s" $(tput setaf 226) $(tput sgr0)
     read FU
   fi
 else
@@ -115,8 +115,8 @@ fi
 #----------------------------------------
 # Postinstall
 #----------------------------------------
-if [ -z "$IS_FREEBSD" ]; then
-	$RM_CMD $DEST_DIR/usr/NextSpace/include/Block_private.h
+if [ -f $NEXTSPACE_ROOT/include/Block_private.h ]; then
+  $RM_CMD $NEXTSPACE_ROOT/include/Block_private.h
 fi
 
 SHORT_VER=`echo ${libdispatch_version} | awk -F. '{print $1}'`
