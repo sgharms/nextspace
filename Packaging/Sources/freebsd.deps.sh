@@ -42,8 +42,6 @@ LIBCOREFOUNDATION_PATCHES="
 #--- gnustep-make
 GNUSTEP_MAKE_DEPS="
     zsh
-    plymouth
-    plymouth-label
 "
 RUNTIME_RUN_DEPS="
     libbsd0
@@ -52,8 +50,6 @@ RUNTIME_RUN_DEPS="
     libcurl3-gnutls
     libavahi-compat-libdnssd1
     zsh
-    plymouth
-    plymouth-label
 "
 #--- libwraster
 WRASTER_DEPS="

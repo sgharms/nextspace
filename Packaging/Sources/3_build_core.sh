@@ -87,6 +87,9 @@ if [ $IS_FREEBSD ]; then
     $MKDIR_CMD -v $DEST_DIR/share
   fi
   $CP_CMD ${CORE_SOURCES}/usr/share/* $DEST_DIR/share/
+
+  # No Plymouth for FreeBSD
+  rm -rf $DEST_DIR/share/plymouth
 else
 
   if ! [ -d $NEXTSPACE_ROOT/bin ];then
