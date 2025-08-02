@@ -1,8 +1,16 @@
-#!/bin/sh
+#!/bin/sh -e
 
 . ../environment.sh
 . /Developer/Makefiles/GNUstep.sh
-. /etc/profile.d/nextspace.sh
+. /etc/profile.d/nextspace.sh || . /usr/local/etc/profile.d/nextspace.sh
+
+if ! [ -z $IS_FREEBSD ]; then
+  if ! [ "$DEST_DIR" = "/usr/local" ]; then
+    printf "%sYou are on FreeBSD and don't have DEST_DIR set to '/usr/local'. This is almost certainly a mistake\n%s" $(tput setaf 226) $(tput sgr0)
+    printf "Use ^C to abort and reinvoke with \"DEST_DIR=/usr/local\". Otherwise, press enter to continue. \n ";
+    read FU
+  fi
+fi
 
 #----------------------------------------
 # Install package dependecies
@@ -53,7 +61,12 @@ $INSTALL_CMD
 #----------------------------------------
 # Install services
 #----------------------------------------
-$CP_CMD ${SOURCES_DIR}/gpbs.service $DEST_DIR/usr/NextSpace/lib/systemd || exit 1
+if ! [ $IS_FREEBSD ]; then
+  $CP_CMD ${SOURCES_DIR}/gpbs.service $DEST_DIR/usr/NextSpace/lib/systemd || exit 1
+else
+  printf "%s%s%s\n" $(tput setaf 1) "gpbs is not enabled because I haven't figure out FreeBSD analogs." $(tput sgr0)
+  printf "%s%s%s\n" $(tput setaf 1) "But I should soon, a shared pasteboard sounds useful." $(tput sgr0)
+fi
 
 if [ "$DEST_DIR" = "" ] && [ "$GITHUB_ACTIONS" != "true" ]; then
 	sudo ldconfig

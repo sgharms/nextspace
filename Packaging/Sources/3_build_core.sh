@@ -12,7 +12,7 @@ $CP_CMD ${CORE_SOURCES}/dot_hidden /.hidden
 
 if ! [ -z $IS_FREEBSD ]; then
   if ! [ "$DEST_DIR" = "/usr/local" ]; then
-    printf "%sYou are on FreeBSD and don't have DEST_DIR set to '/usr/local'. This is almost certainly a mistake\n%s" $(tput af yellow) $(tput sgr0)
+    printf "%sYou are on FreeBSD and don't have DEST_DIR set to '/usr/local'. This is almost certainly a mistake\n%s" $(tput setaf 226) $(tput sgr0)
     printf "Use ^C to abort and reinvoke with \"DEST_DIR=/usr/local\". Otherwise, press enter to continue. \n ";
     read FU
   fi

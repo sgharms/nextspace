@@ -74,7 +74,7 @@ fi
 # Directory where nextspace GitHub repo resides
 cd ../..
 PROJECT_DIR=`pwd`
-printf "NextSpace repo:\t%s\n" $PROJECT_DIR
+printf "NextSpace repo(PROJECT_DIR):\t%s\n" $PROJECT_DIR
 cd ${_PWD}
 
 if [ -z $BUILD_RPM ]; then
@@ -90,7 +90,7 @@ if [ -z $BUILD_RPM ]; then
 
   if [ "$1" != "" ];then
     DEST_DIR=${1}
-    printf "Install in:\t%s\n" $DEST_DIR
+    printf "Install in(DEST_DIR):\t%s\n" $DEST_DIR
   else
     # Allow for setting via environment
     if [ -z "$DEST_DIR" ]; then

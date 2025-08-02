@@ -1,7 +1,7 @@
 #!/bin/sh
 
 . ../environment.sh
-. /etc/profile.d/nextspace.sh
+. /etc/profile.d/nextspace.sh || . /usr/local/etc/profile.d/nextspace.sh
 
 #----------------------------------------
 # Install package dependecies
@@ -41,5 +41,5 @@ $MAKE_CMD || exit 1
 $INSTALL_CMD fonts=no || exit 1
 
 if [ "$DEST_DIR" = "" ]; then
-	sudo ldconfig
+	$PRIV_CMD ldconfig
 fi
