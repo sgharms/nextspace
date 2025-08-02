@@ -10,6 +10,11 @@ if [ ${OS_ID} = "debian" ] || [ ${OS_ID} = "ubuntu" ]; then
 	${ECHO} "Debian-based Linux distribution: calling 'apt-get install'."
 	sudo apt-get install -y ${RUNTIME_DEPS} || exit 1
 elif [ "${OS_ID}" = "freebsd" ]; then
+  if ! [ "$NEXTSPACE_ROOT" = "/usr/local/NextSpace" ]; then
+    printf "%sYou are on FreeBSD and don't have NEXTSPACE_ROOT set to '/usr/local/NextSpace'. This is almost certainly a mistake.\n%s" $(tput setaf 226) $(tput sgr0)
+    printf "%sUse ^C to abort and reinvoke with \"NEXTSPACE_ROOT=/usr/local/NextSpace\". Otherwise, press enter to continue.\n%s" $(tput setaf 226) $(tput sgr0)
+    read FU
+  fi
   ${PRIV_CMD} pkg install ${RUNTIME_DEPS}
 else
 	${ECHO} ">>> Installing ${OS_ID} packages for CoreFoundation build"
@@ -64,16 +69,17 @@ rm -rf .build 2>/dev/null
 mkdir -p .build
 cd .build
 
-C_FLAGS="-I/usr/NextSpace/include -Wno-switch -Wno-enum-conversion"
+NEXTSPACE_ROOT="${NEXTSPACE_ROOT:-/usr/NextSpace}"
+C_FLAGS="-I${NEXTSPACE_ROOT}/include -Wno-switch -Wno-enum-conversion"
 $CMAKE_CMD .. \
 	-DCMAKE_C_COMPILER=${C_COMPILER} \
 	-DCMAKE_C_FLAGS="${C_FLAGS}" \
-	-DCMAKE_SHARED_LINKER_FLAGS="-L/usr/NextSpace/lib -L/usr/local/lib -luuid" \
+	-DCMAKE_SHARED_LINKER_FLAGS="-L${NEXTSPACE_ROOT}/lib -L/usr/local/lib -luuid" \
 	-DCF_DEPLOYMENT_SWIFT=NO \
 	-DBUILD_SHARED_LIBS=YES \
-	-DCMAKE_INSTALL_PREFIX=/usr/NextSpace \
-	-DCMAKE_INSTALL_LIBDIR=/usr/NextSpace/lib \
-	-DCMAKE_LIBRARY_PATH=/usr/NextSpace/lib \
+	-DCMAKE_INSTALL_PREFIX=$NEXTSPACE_ROOT \
+	-DCMAKE_INSTALL_LIBDIR=${NEXTSPACE_ROOT}/lib \
+	-DCMAKE_LIBRARY_PATH=${NEXTSPACE_ROOT}/lib \
 	\
 	-DCMAKE_SKIP_RPATH=ON \
 	-DCMAKE_BUILD_TYPE=Debug \
@@ -87,16 +93,16 @@ if [ -n  "$libcfnetwork_version" ]; then
 	rm -rf .build 2>/dev/null
 	mkdir -p .build
 	cd .build
-	CFN_CFLAGS="-F../../${CF_PKG_NAME}/.build -I/usr/NextSpace/include -I/usr/local/include/avahi-compat-libdns_sd"
-	CFN_LD_FLAGS="-L/usr/NextSpace/lib -L../../${CF_PKG_NAME}/.build/CoreFoundation.framework -L/usr/local/lib -ldns_sd -lCoreFoundation"
+	CFN_CFLAGS="-F../../${CF_PKG_NAME}/.build -I${NEXTSPACE_ROOT}/include -I/usr/local/include/avahi-compat-libdns_sd"
+	CFN_LD_FLAGS="-L${NEXTSPACE_ROOT}/lib -L../../${CF_PKG_NAME}/.build/CoreFoundation.framework -L/usr/local/lib -ldns_sd -lCoreFoundation"
 	cmake .. \
 		-DCMAKE_C_COMPILER=${C_COMPILER} \
 		-DCMAKE_CXX_COMPILER=${CXX_COMPILER} \
 		-DCFNETWORK_CFLAGS="${CFN_CFLAGS}" \
 		-DCFNETWORK_LDLAGS="${CFN_LD_FLAGS}" \
 		-DBUILD_SHARED_LIBS=YES \
-		-DCMAKE_INSTALL_PREFIX=/usr/NextSpace \
-		-DCMAKE_INSTALL_LIBDIR=/usr/NextSpace/lib \
+		-DCMAKE_INSTALL_PREFIX=$NEXTSPACE_ROOT \
+		-DCMAKE_INSTALL_LIBDIR=${NEXTSPACE_ROOT}/lib \
 		\
 		-DCMAKE_SKIP_RPATH=ON \
 		-DCMAKE_BUILD_TYPE=Debug
@@ -111,7 +117,7 @@ fi
 cd ${BUILD_ROOT}/${CF_PKG_NAME}/.build || exit 1
 $INSTALL_CMD
 
-CF_DIR=${DEST_DIR}/usr/NextSpace/Frameworks/CoreFoundation.framework
+CF_DIR=${DEST_DIR}${NEXTSPACE_ROOT}/Frameworks/CoreFoundation.framework
 
 $MKDIR_CMD ${CF_DIR}/Versions/${libcorefoundation_version}
 cd $CF_DIR
@@ -134,7 +140,7 @@ if [ -n  "$libcfnetwork_version" ]; then
 	cd ${BUILD_ROOT}/${CFNET_PKG_NAME}/.build || exit 1
 	$INSTALL_CMD
 
-	CFNET_DIR=${DEST_DIR}/usr/NextSpace/Frameworks/CFNetwork.framework
+	CFNET_DIR=${NEXTSPACE_ROOT}/Frameworks/CFNetwork.framework
 
 	$MKDIR_CMD $CFNET_DIR/Versions/${libcfnetwork_version}
 	cd $CFNET_DIR
