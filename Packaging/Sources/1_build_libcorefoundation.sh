@@ -37,8 +37,17 @@ fi
 #----------------------------------------
 # CoreFoundation
 cd ${BUILD_ROOT}/${CF_PKG_NAME} || exit 1
+
+# Patch FreeBSD version based on work done in the lang/swift port
 if [ $IS_FREEBSD ]; then
+  SWIFT_PORT_DIR="/usr/ports/lang/swift510"
   echo "Applying FreeBSD-specific patches"
+  if [ -z "${LIBCOREFOUNDATION_PATCHES_DIR}" ] && ! [ -d "${SWIFT_PORT_DIR}" ]; then
+    printf "%sYou are on FreeBSD and we need the lang/swift patches provided in /usr/ports\n%s" $(tput setaf 1) $(tput sgr0)
+    printf "%sInstall the ports tree *OR* override with the LIBCOREFOUNDATION_PATCHES_DIR variable.\n%s" $(tput setaf 1) $(tput sgr0)
+    printf "%sHere would be a good time to ^C. Or #YOLO and press Enter to continue.\n%s" $(tput setaf 1) $(tput sgr0)
+    read FU
+  fi
   if [ -z "${LIBCOREFOUNDATION_PATCHES_DIR}" ]; then
     LIBCOREFOUNDATION_PATCHES_DIR="/usr/ports/lang/swift$(echo $libcorefoundation_version | tr -d '.')/files"
   fi
