@@ -59,9 +59,11 @@ if [ $IS_FREEBSD ]; then
   done
   patch -p0 < "${OLDPWD}/patches/patch-libcorefoundation-RunLoop.subproj-CFFileDescriptor.h"
 fi
+
 rm -rf .build 2>/dev/null
 mkdir -p .build
 cd .build
+
 C_FLAGS="-I/usr/NextSpace/include -Wno-switch -Wno-enum-conversion"
 $CMAKE_CMD .. \
 	-DCMAKE_C_COMPILER=${C_COMPILER} \
