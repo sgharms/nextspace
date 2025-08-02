@@ -11,6 +11,11 @@ if [ "${OS_ID}" = "debian" ] || [ "${OS_ID}" = "ubuntu" ]; then
 	sudo apt-get install -q -y ${BUILD_TOOLS} ${RUNTIME_DEPS} || exit 1
 elif [ "${OS_ID}" = "freebsd" ]; then
   ${PRIV_CMD} pkg install ${BUILD_TOOLS} ${RUNTIME_DEPS}
+  if ! [ "$DEST_DIR" = "/usr/local" ]; then
+    printf "%sYou are on FreeBSD and don't have DEST_DIR set to '/usr/local'. This is almost certainly a mistake\n%s" $(tput setaf 226) $(tput sgr0)
+    printf "Use ^C to abort and reinvoke with \"DEST_DIR=/usr/local\". Otherwise, press enter to continue. \n ";
+    read FU
+  fi
 else
 	if [ "${OS_ID}" = "fedora" ] || [ "$OS_ID" = "ultramarine" ]; then
 		${ECHO} "No need to build - installing 'libdispatch-devel' from Fedora repository..."
@@ -57,15 +62,16 @@ mkdir -p _build
 cd _build
 
 if [ $IS_FREEBSD ]; then
+  NEXTSPACE_ROOT="${DEST_DIR}/NextSpace"
 	$CMAKE_CMD .. \
 		-G Ninja \
     -DCMAKE_C_COMPILER=${C_COMPILER} \
     -DCMAKE_CXX_COMPILER=${CXX_COMPILER} \
     -DCMAKE_C_FLAGS=${C_FLAGS} \
     -DCMAKE_CXX_FLAGS=${C_FLAGS} \
-    -DCMAKE_INSTALL_PREFIX=/usr/NextSpace \
-    -DCMAKE_INSTALL_LIBDIR=/usr/NextSpace/lib \
-    -DCMAKE_INSTALL_MANDIR=/usr/NextSpace/Documentation/man \
+    -DCMAKE_INSTALL_PREFIX=${NEXTSPACE_ROOT} \
+    -DCMAKE_INSTALL_LIBDIR=${NEXTSPACE_ROOT}/lib \
+    -DCMAKE_INSTALL_MANDIR=${NEXTSPACE_ROOT}/Documentation/man \
     -DBUILD_TESTING=OFF \
     -DCMAKE_SKIP_RPATH=ON \
     -DCMAKE_BUILD_TYPE=Debug \
@@ -111,7 +117,12 @@ fi
 
 SHORT_VER=`echo ${libdispatch_version} | awk -F. '{print $1}'`
 
-cd ${DEST_DIR}/usr/NextSpace/lib
+if [ "$IS_FREEBSD" ]; then
+  cd ${NEXTSPACE_ROOT}/lib
+else
+  cd ${DEST_DIR}/usr/NextSpace/lib
+fi
+
 
 $ECHO "-- Creating link for libBlocksRuntime.so.${libdispatch_version}"
 $PRIV_CMD $MV_CMD libBlocksRuntime.so libBlocksRuntime.so.${libdispatch_version}
