@@ -10,7 +10,7 @@ if [ ${OS_ID} = "debian" ] || [ ${OS_ID} = "ubuntu" ]; then
 	${ECHO} "Debian-based Linux distribution: calling 'apt-get install'."
 	sudo apt-get install -y ${GNUSTEP_MAKE_DEPS} || exit 1
 elif [ $IS_FREEBSD ]; then
-  ${ECHO} "FreeBSD is easy like Sunday morning"
+  # Nothing needs to happen here...
 else
 	${ECHO} "RedHat-based Linux distribution: calling 'yum -y install'."
 	SPEC_FILE=${PROJECT_DIR}/Core/nextspace-core.spec
@@ -35,18 +35,35 @@ fi
 # Build
 #----------------------------------------
 cd ${BUILD_ROOT}/${GIT_PKG_NAME}
-$MAKE_CMD clean
 #export RUNTIME_VERSION="gnustep-1.8"
-export PKG_CONFIG_PATH="/usr/NextSpace/lib/pkgconfig"
 export CC=clang
 export CXX=clang++
-export CFLAGS="-F/usr/NextSpace/Frameworks"
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"/usr/NextSpace/lib"
 
-cp ${CORE_SOURCES}/nextspace.fsl ${BUILD_ROOT}/tools-make-make-${gnustep_make_version}/FilesystemLayouts/nextspace
+if ! [ $IS_FREEBSD ]; then
+  $MAKE_CMD clean
+  export PKG_CONFIG_PATH="/usr/NextSpace/lib/pkgconfig"
+  export CFLAGS="-F/usr/NextSpace/Frameworks"
+  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"/usr/NextSpace/lib"
+
+  cp ${CORE_SOURCES}/nextspace.fsl ${BUILD_ROOT}/tools-make-make-${gnustep_make_version}/FilesystemLayouts/nextspace
+else
+  if ! [ "$NEXTSPACE_ROOT" = "/usr/local/NextSpace" ]; then
+    printf "%sYou are on FreeBSD and don't have NEXTSPACE_ROOT set to '/usr/local/NextSpace'. This is almost certainly a mistake.\n%s" $(tput setaf 226) $(tput sgr0)
+    printf "%sUse ^C to abort and reinvoke with \"NEXTSPACE_ROOT=/usr/local/NextSpace\". Otherwise, press enter to continue.\n%s" $(tput setaf 226) $(tput sgr0)
+    read FU
+  fi
+  export PKG_CONFIG_PATH="$NEXTSPACE_ROOT/lib/pkgconfig"
+  export CFLAGS="-F$NEXTSPACE_ROOT/Frameworks"
+  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"$NEXTSPACE_ROOT/lib"
+
+  cp ${CORE_SOURCES}/nextspace-freebsd.fsl ${BUILD_ROOT}/tools-make-make-${gnustep_make_version}/FilesystemLayouts/nextspace
+fi
+
+CONFIG_FILE_PATH="$DEST_DIR/Library/Preferences/GNUstep.conf"
+
 ./configure \
 	--prefix=/ \
-	--with-config-file=/Library/Preferences/GNUstep.conf \
+	--with-config-file=$CONFIG_FILE_PATH \
 	--with-layout=nextspace \
 	--enable-native-objc-exceptions \
 	--enable-debug-by-default \

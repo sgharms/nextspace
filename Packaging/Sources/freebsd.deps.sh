@@ -40,9 +40,6 @@ LIBCOREFOUNDATION_PATCHES="
 "
 
 #--- gnustep-make
-GNUSTEP_MAKE_DEPS="
-    zsh
-"
 RUNTIME_RUN_DEPS="
     libbsd0
     libuuid1
