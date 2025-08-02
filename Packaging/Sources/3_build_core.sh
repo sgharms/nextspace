@@ -71,10 +71,16 @@ $CP_CMD ${CORE_SOURCES}/etc/skel/Library /root
 
 # Scripts
 if [ $IS_FREEBSD ]; then
-  if ! [ -d $DEST_DIR/NextSpace/bin ];then
-    $MKDIR_CMD -v $DEST_DIR/NextSpace/bin
+  if ! [ "$NEXTSPACE_ROOT" = "/usr/local/NextSpace" ]; then
+    printf "%sYou are on FreeBSD and don't have NEXTSPACE_ROOT set to '/usr/local/NextSpace'. This is almost certainly a mistake.\n%s" $(tput setaf 226) $(tput sgr0)
+    printf "%sUse ^C to abort and reinvoke with \"NEXTSPACE_ROOT=/usr/local/NextSpace\". Otherwise, press enter to continue.\n%s" $(tput setaf 226) $(tput sgr0)
+    read FU
   fi
-  $CP_CMD ${CORE_SOURCES}/usr/NextSpace/bin/* $DEST_DIR/NextSpace/bin/
+
+  if ! [ -d $NEXTSPACE_ROOT/bin ];then
+    $MKDIR_CMD -v $NEXTSPACE_ROOT/bin
+  fi
+  $CP_CMD ${CORE_SOURCES}/usr/NextSpace/bin/* $NEXTSPACE_ROOT/bin/
 
   # Icons, Plymouth resources and fontconfig configuration
   if ! [ -d $DEST_DIR/share ]; then
@@ -83,10 +89,10 @@ if [ $IS_FREEBSD ]; then
   $CP_CMD ${CORE_SOURCES}/usr/share/* $DEST_DIR/share/
 else
 
-  if ! [ -d $DEST_DIR/usr/NextSpace/bin ];then
-    $MKDIR_CMD -v $DEST_DIR/usr/NextSpace/bin
+  if ! [ -d $NEXTSPACE_ROOT/bin ];then
+    $MKDIR_CMD -v $NEXTSPACE_ROOT/bin
   fi
-  $CP_CMD ${CORE_SOURCES}/usr/NextSpace/bin/* $DEST_DIR/usr/NextSpace/bin/
+  $CP_CMD ${CORE_SOURCES}/usr/NextSpace/bin/* $NEXTSPACE_ROOT/bin/
 
   # Icons, Plymouth resources and fontconfig configuration
   if ! [ -d $DEST_DIR/usr/share ];then
