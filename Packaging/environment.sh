@@ -187,3 +187,5 @@ if [ "$OS_ID" = "fedora" ] || [ "$OS_LIKE" = "rhel" ] || [ "$OS_ID" = "debian" ]
   which clang++ 2>&1 > /dev/null || { echo "No clang++ compiler found. Please install clang++ package."; exit 1; }
   export CXX_COMPILER=`which clang++`
 fi
+
+WARN="printf '$(tput setaf 226)%s$(tput srg0)\n'"
