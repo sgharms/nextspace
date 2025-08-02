@@ -12,9 +12,8 @@ if [ "${OS_ID}" = "debian" ] || [ "${OS_ID}" = "ubuntu" ]; then
 elif [ "${OS_ID}" = "freebsd" ]; then
   ${PRIV_CMD} pkg install ${BUILD_TOOLS} ${RUNTIME_DEPS}
   if ! [ "$DEST_DIR" = "/usr/local" ]; then
-    $WARN "You are on FreeBSD and don't have DEST_DIR set to '/usr/local'. This is almost certainly a mistake" 
-    $WARN "Use ^C to abort and reinvoke with \"DEST_DIR=/usr/local\". Otherwise, press enter to continue."
-    tput sgr0
+    printf "%sYou are on FreeBSD and don't have DEST_DIR set to '/usr/local'. This is almost certainly a mistake\n%s" $(tput setaf 226) $(tput sgr0)
+    printf "Use ^C to abort and reinvoke with \"DEST_DIR=/usr/local\". Otherwise, press enter to continue. \n ";
     read FU
   fi
 else
