@@ -107,9 +107,10 @@ fi
 #----------------------------------------
 # Install
 #----------------------------------------
-#sudo $MAKE_CMD install
 if [ -z "$IS_FREEBSD" ]; then
-	$INSTALL_CMD
+	$PRIV_CMD $INSTALL_CMD
+else
+	${PRIV_CMD} ninja -j ${JOBS_VALUE:-1} install
 fi
 
 #----------------------------------------
