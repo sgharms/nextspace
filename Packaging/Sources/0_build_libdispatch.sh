@@ -62,24 +62,7 @@ rm -rf _build 2>/dev/null
 mkdir -p _build
 cd _build
 
-if [ $IS_FREEBSD ]; then
-  NEXTSPACE_ROOT="${DEST_DIR}/NextSpace"
-	$CMAKE_CMD .. \
-		-G Ninja \
-    -DCMAKE_C_COMPILER=${C_COMPILER} \
-    -DCMAKE_CXX_COMPILER=${CXX_COMPILER} \
-    -DCMAKE_C_FLAGS=${C_FLAGS} \
-    -DCMAKE_CXX_FLAGS=${C_FLAGS} \
-    -DCMAKE_INSTALL_PREFIX=${NEXTSPACE_ROOT} \
-    -DCMAKE_INSTALL_LIBDIR=${NEXTSPACE_ROOT}/lib \
-    -DCMAKE_INSTALL_MANDIR=${NEXTSPACE_ROOT}/Documentation/man \
-    -DBUILD_TESTING=OFF \
-    -DCMAKE_SKIP_RPATH=ON \
-    -DCMAKE_BUILD_TYPE=Debug \
-		|| exit 1
-	ninja -j8
-	${PRIV_CMD} ninja -j8 install
-else
+if ! [ $IS_FREEBSD ]; then
   C_FLAGS="-Wno-error=unused-but-set-variable"
   $CMAKE_CMD .. \
     -DCMAKE_C_COMPILER=${C_COMPILER} \
@@ -99,6 +82,26 @@ else
 
   $MAKE_CMD clean
   $MAKE_CMD
+else
+  NEXTSPACE_ROOT="${DEST_DIR}/NextSpace"
+  JOBS_VALUE=$(( $(sysctl -n kern.smp.cores)*$(sysctl -n kern.smp.threads_per_core) ))
+	$CMAKE_CMD .. \
+		-G Ninja \
+    -DCMAKE_C_COMPILER=${C_COMPILER} \
+    -DCMAKE_CXX_COMPILER=${CXX_COMPILER} \
+    -DCMAKE_C_FLAGS=${C_FLAGS} \
+    -DCMAKE_CXX_FLAGS=${C_FLAGS} \
+    -DCMAKE_INSTALL_PREFIX=${NEXTSPACE_ROOT} \
+    -DCMAKE_INSTALL_LIBDIR=${NEXTSPACE_ROOT}/lib \
+    -DCMAKE_INSTALL_MANDIR=${NEXTSPACE_ROOT}/Documentation/man \
+    -DBUILD_TESTING=OFF \
+    -DCMAKE_SKIP_RPATH=ON \
+    -DCMAKE_BUILD_TYPE=Debug \
+		|| exit 1
+
+  # Not provided as a target
+  # $MAKE_CMD clean
+	ninja -j ${JOBS_VALUE:-1}
 fi
 
 #----------------------------------------
