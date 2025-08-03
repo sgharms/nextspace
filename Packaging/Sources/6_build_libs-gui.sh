@@ -1,8 +1,8 @@
 #!/bin/sh -e
 
 . ../environment.sh
-. /Developer/Makefiles/GNUstep.sh
-. /etc/profile.d/nextspace.sh || . /usr/local/etc/profile.d/nextspace.sh
+. "${GNUSTEP_MAKEFILES}/GNUstep.sh"
+. ${DEST_DIR}/etc/profile.d/nextspace.sh
 
 if ! [ -z $IS_FREEBSD ]; then
   if ! [ "$DEST_DIR" = "/usr/local" ]; then
@@ -18,6 +18,8 @@ fi
 if [ ${OS_ID} = "debian" ] || [ ${OS_ID} = "ubuntu" ]; then
   	${ECHO} ">>> Installing packages for GNUstep GUI (AppKit) build"
 	sudo apt-get install -q -y ${GNUSTEP_GUI_DEPS}
+elif [ $IS_FREEBSD ]; then
+  pkg install -y cairo
 fi
 
 #----------------------------------------
@@ -51,7 +53,10 @@ if [ ${OS_ID} = "debian" ] || [ ${OS_ID} = "ubuntu" ]; then
 else
 	./configure || exit 1
 fi
-$MAKE_CMD || exit 1
+
+if ! [ $IS_FREEBSD ]; then
+  $MAKE_CMD || exit 1
+fi
 
 #----------------------------------------
 # Install
@@ -64,12 +69,14 @@ $INSTALL_CMD
 if ! [ $IS_FREEBSD ]; then
   $CP_CMD ${SOURCES_DIR}/gpbs.service $DEST_DIR/usr/NextSpace/lib/systemd || exit 1
 else
-  printf "%s%s%s\n" $(tput setaf 1) "gpbs is not enabled because I haven't figure out FreeBSD analogs." $(tput sgr0)
-  printf "%s%s%s\n" $(tput setaf 1) "But I should soon, a shared pasteboard sounds useful." $(tput sgr0)
+  printf "%s%s%s\n" $(tput setaf 226) "FreeBSD User: gpbs seems to have been removed from this project." $(tput sgr0)
+  printf "%s%s%s\n" $(tput setaf 226) "Don't worry. Be happy." $(tput sgr0)
 fi
 
 if [ "$DEST_DIR" = "" ] && [ "$GITHUB_ACTIONS" != "true" ]; then
 	sudo ldconfig
-	sudo systemctl daemon-reload || exit 1
-	systemctl status gpbs || sudo systemctl enable /usr/NextSpace/lib/systemd/gpbs.service;
+  if ! [ $IS_FREEBSD ]; then
+    sudo systemctl daemon-reload || exit 1
+    systemctl status gpbs || sudo systemctl enable /usr/NextSpace/lib/systemd/gpbs.service;
+  fi
 fi
