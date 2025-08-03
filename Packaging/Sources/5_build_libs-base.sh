@@ -1,8 +1,9 @@
 #!/bin/sh
 
 . ../environment.sh
-. /Developer/Makefiles/GNUstep.sh
-. /etc/profile.d/nextspace.sh
+. "${PROJECT_DIR}/Core/nextspace${IS_FREEBSD:+-freebsd}.fsl"
+. "${GNUSTEP_MAKEFILES}/GNUstep.sh"
+. ${DEST_DIR}/etc/profile.d/nextspace.sh
 
 if ! [ -z $IS_FREEBSD ]; then
   if ! [ "$DEST_DIR" = "/usr/local" ]; then
@@ -20,7 +21,7 @@ if [ ${OS_ID} = "debian" ] || [ ${OS_ID} = "ubuntu" ]; then
 	${ECHO} "Debian-based Linux distribution: calling 'apt-get install'."
 	sudo apt-get install -y ${GNUSTEP_BASE_DEPS} || exit 1
 elif [ $IS_FREEBSD ]; then
-	#sudo apt-get install -y ${GNUSTEP_BASE_DEPS} || exit 1
+  $PRIV_CMD pkg install -y ${GNUSTEP_BASE_DEPS}
 else
 	${ECHO} "RedHat-based Linux distribution: calling 'yum -y install'."
 	SPEC_FILE=${PROJECT_DIR}/Libraries/gnustep/nextspace-gnustep.spec

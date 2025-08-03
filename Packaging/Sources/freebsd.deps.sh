@@ -71,12 +71,7 @@ WRASTER_RUN_DEPS="
 "
 #--- gnustep-base
 GNUSTEP_BASE_DEPS="
-    libffi-dev
-    libxml2-dev
-    libxslt1-dev
-    libavahi-client-dev
-    libcups2-dev
-    libgnutls28-dev
+    gnutls
 "
 GNUSTEP_BASE_RUN_DEPS="
     libffi8
