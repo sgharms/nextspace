@@ -106,14 +106,10 @@ BACK_ART_RUN_DEPS="
 "
 #--- Frameworks
 FRAMEWORKS_BUILD_DEPS="
-    libmagic-dev
-    libudisks2-dev
-    libdbus-1-dev
-    libupower-glib-dev
-    libxkbfile-dev
-    libxcursor-dev
-    libxrandr-dev
-    libpulse-dev
+    dbus
+    libXrandr
+    libXcursor
+    xorg-server
 "
 FRAMEWORKS_RUN_DEPS="
     libmagic1
