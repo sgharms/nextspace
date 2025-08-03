@@ -11,40 +11,38 @@ GNUSTEP_SYSTEM_USERS_DIR=/home
 GNUSTEP_NETWORK_USERS_DIR=/home
 GNUSTEP_LOCAL_USERS_DIR=/home
 
-# NB: $prefix will be added to all the MAKEFILES/SYSTEM/NETWORK/LOCAL
-# paths.
 GNUSTEP_MAKEFILES=/usr/local/share/GNUstep/Makefiles
 
 
 # SYSTEM domain
 # This is where all NextSpace related file are installed.
-GNUSTEP_SYSTEM_APPS=/NextSpace/Apps
-GNUSTEP_SYSTEM_ADMIN_APPS=/NextSpace/Apps
-GNUSTEP_SYSTEM_WEB_APPS=/NextSpace/WebApps
-GNUSTEP_SYSTEM_TOOLS=/NextSpace/bin
-GNUSTEP_SYSTEM_ADMIN_TOOLS=/NextSpace/sbin
-GNUSTEP_SYSTEM_LIBRARY=/NextSpace
-GNUSTEP_SYSTEM_HEADERS=/NextSpace/include
-GNUSTEP_SYSTEM_LIBRARIES=/NextSpace/lib
-GNUSTEP_SYSTEM_DOC=/NextSpace/Documentation
-GNUSTEP_SYSTEM_DOC_MAN=/NextSpace/share/man
-GNUSTEP_SYSTEM_DOC_INFO=/NextSpace/share/info
+GNUSTEP_SYSTEM_APPS=/usr/local/NextSpace/Apps
+GNUSTEP_SYSTEM_ADMIN_APPS=/usr/local/NextSpace/Apps
+GNUSTEP_SYSTEM_WEB_APPS=/usr/local/NextSpace/WebApps
+GNUSTEP_SYSTEM_TOOLS=/usr/local/NextSpace/bin
+GNUSTEP_SYSTEM_ADMIN_TOOLS=/usr/local/NextSpace/sbin
+GNUSTEP_SYSTEM_LIBRARY=/usr/local/NextSpace
+GNUSTEP_SYSTEM_HEADERS=/usr/local/NextSpace/include
+GNUSTEP_SYSTEM_LIBRARIES=/usr/local/NextSpace/lib
+GNUSTEP_SYSTEM_DOC=/usr/local/NextSpace/Documentation
+GNUSTEP_SYSTEM_DOC_MAN=/usr/local/NextSpace/share/man
+GNUSTEP_SYSTEM_DOC_INFO=/usr/local/NextSpace/share/info
 
 # NETWORK domain
 # Until it can be used everywhere, we use it as fake DEVELOPER domain.
 # Then we can install developer tools (Gorm, ProjectCenter, etc.) in
 # /Developer/Applications and have associated file extensions with tools.
-GNUSTEP_NETWORK_APPS=/Developer/Applications
-GNUSTEP_NETWORK_ADMIN_APPS=/Developer/Applications
-GNUSTEP_NETWORK_WEB_APPS=/Developer/WebApplications
-GNUSTEP_NETWORK_TOOLS=/Developer/bin
-GNUSTEP_NETWORK_ADMIN_TOOLS=/Developer/sbin
-GNUSTEP_NETWORK_LIBRARY=/Developer/Library
-GNUSTEP_NETWORK_HEADERS=/Developer/Headers
-GNUSTEP_NETWORK_LIBRARIES=/Developer/Libraries
-GNUSTEP_NETWORK_DOC=/Developer/Documentation
-GNUSTEP_NETWORK_DOC_MAN=/Developer/Documentation/man
-GNUSTEP_NETWORK_DOC_INFO=/Developer/Documentation/info
+GNUSTEP_NETWORK_APPS=/usr/local/Developer/Applications
+GNUSTEP_NETWORK_ADMIN_APPS=/usr/local/Developer/Applications
+GNUSTEP_NETWORK_WEB_APPS=/usr/local/Developer/WebApplications
+GNUSTEP_NETWORK_TOOLS=/usr/local/Developer/bin
+GNUSTEP_NETWORK_ADMIN_TOOLS=/usr/local/Developer/sbin
+GNUSTEP_NETWORK_LIBRARY=/usr/local/Developer/Library
+GNUSTEP_NETWORK_HEADERS=/usr/local/Developer/Headers
+GNUSTEP_NETWORK_LIBRARIES=/usr/local/Developer/Libraries
+GNUSTEP_NETWORK_DOC=/usr/local/Developer/Documentation
+GNUSTEP_NETWORK_DOC_MAN=/usr/local/Developer/Documentation/man
+GNUSTEP_NETWORK_DOC_INFO=/usr/local/Developer/Documentation/info
 
 # LOCAL domain
 # This is where GNUstep libraries and resources.
