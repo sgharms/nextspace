@@ -47,17 +47,17 @@ GNUSTEP_NETWORK_DOC_INFO=/usr/local/Developer/Documentation/info
 # LOCAL domain
 # This is where GNUstep libraries and resources.
 # User visible NextSpace's applications also installed here.
-GNUSTEP_LOCAL_APPS=/Applications
-GNUSTEP_LOCAL_ADMIN_APPS=/Applications/Utilities
-GNUSTEP_LOCAL_WEB_APPS=/Library/WebApplications
-GNUSTEP_LOCAL_TOOLS=/Library/bin
-GNUSTEP_LOCAL_ADMIN_TOOLS=/Library/sbin
-GNUSTEP_LOCAL_LIBRARY=/Library
-GNUSTEP_LOCAL_HEADERS=/Developer/Headers
-GNUSTEP_LOCAL_LIBRARIES=/Library/Libraries
-GNUSTEP_LOCAL_DOC=/Library/Documentation
-GNUSTEP_LOCAL_DOC_MAN=/Library/Documentation/man
-GNUSTEP_LOCAL_DOC_INFO=/Library/Documentation/info
+GNUSTEP_LOCAL_APPS=/usr/local/Applications
+GNUSTEP_LOCAL_ADMIN_APPS=/usr/local/Applications/Utilities
+GNUSTEP_LOCAL_WEB_APPS=/usr/local/Library/WebApplications
+GNUSTEP_LOCAL_TOOLS=/usr/local/Library/bin
+GNUSTEP_LOCAL_ADMIN_TOOLS=/usr/local/Library/sbin
+GNUSTEP_LOCAL_LIBRARY=/usr/local/Library
+GNUSTEP_LOCAL_HEADERS=/usr/local/Developer/Headers
+GNUSTEP_LOCAL_LIBRARIES=/usr/local/Library/Libraries
+GNUSTEP_LOCAL_DOC=/usr/local/Library/Documentation
+GNUSTEP_LOCAL_DOC_MAN=/usr/local/Library/Documentation/man
+GNUSTEP_LOCAL_DOC_INFO=/usr/local/Library/Documentation/info
 
 # USER domain
 # Important: settings in the User should normally be relative paths,
