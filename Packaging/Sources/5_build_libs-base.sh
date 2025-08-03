@@ -49,7 +49,10 @@ if [ -d obj ]; then
 	$MAKE_CMD clean
 fi
 ./configure || exit 1
-$MAKE_CMD || exit 1
+
+if ! [ $IS_FREEBSD ]; then
+  $MAKE_CMD || exit 1
+fi
 
 #----------------------------------------
 # Install
@@ -63,14 +66,19 @@ cd ${_PWD}
 SOURCES_DIR=${PROJECT_DIR}/Libraries/gnustep
 
 if [ $IS_FREEBSD ]; then
-  $MKDIR_CMD $DEST_DIR/NextSpace/etc
-  $CP_CMD ${SOURCES_DIR}/gdomap.interfaces $DEST_DIR/NextSpace/etc/
-  $MKDIR_CMD $DEST_DIR/NextSpace/lib/systemd
-  $CP_CMD ${SOURCES_DIR}/gdomap.service $DEST_DIR/NextSpace/lib/systemd
-  $CP_CMD ${SOURCES_DIR}/gdnc.service $DEST_DIR/NextSpace/lib/systemd
-  $CP_CMD ${SOURCES_DIR}/gdnc-local.service $DEST_DIR/NextSpace/lib/systemd
-  printf "%s%s%s\n" $(tput setaf 1) "gdomap and gdnc are not enabled because I haven't figure out FreeBSD analogs." $(tput sgr0)
-  printf "%s%s%s\n" $(tput setaf 1) "Stub implementations from the Linux version have been copied." $(tput sgr0)
+  # RC file for starting gdomap
+  # Per gdomap(8): Usually the gdomap daemon is started at system boot time and
+  # binds itself to port 538.
+  $CP_CMD ${SOURCES_DIR}/gdomap /usr/local/etc/rc.d
+  sysrc gdomap_enable=YES
+  service gdomap start
+  
+  # gdnc(1) Every user needs to have his own instance of gdnc running...
+  # recommended to start gdnc in a personal login script like ~/.bashrc  or
+  # ~/.cshrc.
+  printf "%sEnsure you're sourcing %s in your shell login profile.\n%s" $(tput setaf 2) "${GNUSTEP_MAKEFILES}/GNUstep.sh" $(tput sgr0)
+  printf "%sPer gdnc(1), launch %s as part of your shell login profile.\n%s" $(tput setaf 2) "$(/usr/local/NextSpace/bin/gnustep-config --variable=GNUSTEP_LOCAL_TOOLS)/gdnc" $(tput sgr0)
+
 else
   $MKDIR_CMD $DEST_DIR/usr/NextSpace/etc
   $CP_CMD ${SOURCES_DIR}/gdomap.interfaces $DEST_DIR/usr/NextSpace/etc/
