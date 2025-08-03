@@ -94,12 +94,7 @@ GNUSTEP_GUI_RUN_DEPS="
 "
 #--- back-art
 BACK_ART_DEPS="
-    libart-2.0-dev
-    libfreetype-dev
-    libxcursor-dev
-    libxfixes-dev
-    libxt-dev
-    libxrandr-dev
+    libart_lgpl
 "
 BACK_ART_RUN_DEPS="
     libart-2.0-2
