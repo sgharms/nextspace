@@ -51,6 +51,12 @@ RUNTIME_RUN_DEPS="
 #--- libwraster
 WRASTER_DEPS="
   GraphicsMagick
+  graphics/giflib
+  graphics/png
+  graphics/jbigkit
+  graphics/tiff
+  graphics/webp
+  libXmu
 "
 WRASTER_RUN_DEPS="
     libgif7

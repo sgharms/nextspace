@@ -1,7 +1,7 @@
 #!/bin/sh
 
 . ../environment.sh
-. /etc/profile.d/nextspace.sh
+. "${DEST_DIR}/etc/profile.d/nextspace.sh"
 
 #----------------------------------------
 # Install package dependencies
@@ -35,20 +35,16 @@ cp -R ${SOURCES_DIR} ${BUILD_ROOT}
 #----------------------------------------
 # Build
 #----------------------------------------
-. /Developer/Makefiles/GNUstep.sh
+. "${PROJECT_DIR}/Core/nextspace${IS_FREEBSD:+-freebsd}.fsl"
+. "${GNUSTEP_MAKEFILES}/GNUstep.sh"
+
 cd ${BUILD_DIR}
 export CC=${C_COMPILER}
 export CMAKE=${CMAKE_CMD}
 export QA_SKIP_BUILD_ROOT=1
 
-if [ $IS_FREEBSD ]; then
-  ${CMAKE_CMD} .. -DCMAKE_C_FLAGS="-I/usr/local/include/GraphicsMagick" \
-               -DCMAKE_EXE_LINKER_FLAGS="-L/usr/local/lib" \
-               -DCMAKE_SHARED_LINKER_FLAGS="-L/usr/local/lib"
-fi
-
-$MAKE_CMD || exit 1
-$INSTALL_CMD || exit 1
+# $MAKE_CMD || exit 1
+$PRIV_CMD $INSTALL_CMD || exit 1
 
 if [ "$DEST_DIR" = "" ]; then
 	$PRIV_CMD ldconfig
