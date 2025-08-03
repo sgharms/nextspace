@@ -29,6 +29,7 @@ if [ ! -d ${BUILD_ROOT}/libobjc2-${libobjc2_version} ]; then
 	tar zxf libobjc2_robin-map.tar.gz
 fi
 
+NEXTSPACE_ROOT=${NEXTSPACE_ROOT:-/usr/NextSpace/}
 #----------------------------------------
 # Build
 #----------------------------------------
@@ -50,11 +51,11 @@ $CMAKE_CMD .. \
 	-DCMAKE_C_COMPILER=${C_COMPILER} \
 	-DCMAKE_CXX_COMPILER=${CXX_COMPILER} \
 	-DGNUSTEP_INSTALL_TYPE=NONE \
-	-DCMAKE_C_FLAGS="-I/usr/NextSpace/include -g" \
-	-DCMAKE_LIBRARY_PATH=/usr/NextSpace/lib \
+	-DCMAKE_C_FLAGS="-I${NEXTSPACE_ROOT}include -g" \
+	-DCMAKE_LIBRARY_PATH=${NEXTSPACE_ROOT}/lib \
 	-DCMAKE_INSTALL_LIBDIR=lib \
-	-DCMAKE_INSTALL_PREFIX=/usr/NextSpace \
-	-DCMAKE_MODULE_LINKER_FLAGS="-fuse-ld=/usr/bin/ld.gold -Wl,-rpath,/usr/NextSpace/lib" \
+	-DCMAKE_INSTALL_PREFIX=${NEXTSPACE_ROOT} \
+	-DCMAKE_MODULE_LINKER_FLAGS="-fuse-ld=/usr/bin/ld.gold -Wl,-rpath,${NEXTSPACE_ROOT}/lib" \
 	-DCMAKE_SKIP_RPATH=ON \
 	-DTESTS=OFF \
 	-DCMAKE_BUILD_TYPE=Release \
@@ -67,13 +68,19 @@ $MAKE_CMD
 #----------------------------------------
 # Install
 #----------------------------------------
-if [ -f $DEST_DIR/usr/NextSpace/include/Block.h ]; then
-	$MV_CMD $DEST_DIR/usr/NextSpace/include/Block.h $DEST_DIR/usr/NextSpace/include/Block-libdispatch.h
+# Rename libdispatch-originated Block.h
+if [ -f ${NEXTSPACE_ROOT}/include/Block.h ]; then
+	$MV_CMD ${NEXTSPACE_ROOT}/include/Block.h ${NEXTSPACE_ROOT}/include/Block-libdispatch.h
 fi
+
 $INSTALL_CMD || exit 1
-if [ -f $DEST_DIR/usr/NextSpace/include/Block-libdispatch.h ]; then
-	$MV_CMD $DEST_DIR/usr/NextSpace/include/Block.h $DEST_DIR/usr/NextSpace/include/Block-libobjc.h
-	$MV_CMD $DEST_DIR/usr/NextSpace/include/Block-libdispatch.h $DEST_DIR/usr/NextSpace/include/Block.h
+
+# Logically, extend the condition one if ago: "libdispatch installed a Block.h"
+if [ -f ${NEXTSPACE_ROOT}/include/Block-libdispatch.h ]; then
+  # and rename a just-installed libobjc-originated Block.h
+	$MV_CMD $NEXTSPACE_ROOT/include/Block.h ${NEXTSPACE_ROOT}/include/Block-libobjc.h
+  # and put the original back in place
+	$MV_CMD $NEXTSPACE_ROOT/include/Block-libdispatch.h ${NEXTSPACE_ROOT}/include/Block.h
 fi
 
 if [ "$DEST_DIR" = "" ]; then
