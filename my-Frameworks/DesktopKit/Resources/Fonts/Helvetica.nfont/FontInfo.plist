@@ -1,0 +1,24 @@
+{
+	Faces = (
+		{
+			Name = Medium;
+			PostScriptName = Helvetica-Medium;
+			Files = (Helvetica-Medium.ttf);
+		},
+		{
+			Name = Bold;
+			PostScriptName = Helvetica-Bold;
+			Files = (Helvetica-Bold.ttf);
+		},
+		{
+			Name = Oblique;
+			PostScriptName = Helvetica-Oblique;
+			Files = (Helvetica-Oblique.ttf);
+		},
+		{
+			Name = "Bold Oblique";
+			PostScriptName = Helvetica-BoldOblique;
+			Files = (Helvetica-BoldOblique.ttf);
+		}
+	);
+}

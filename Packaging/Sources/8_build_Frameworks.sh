@@ -27,13 +27,13 @@ fi
 #----------------------------------------
 # Download
 #----------------------------------------
-SOURCES_DIR=${PROJECT_DIR}/Frameworks
+SOURCES_DIR=${PROJECT_DIR}/my-Frameworks
 BUILD_DIR=${BUILD_ROOT}/Frameworks
 
 if [ -d ${BUILD_DIR} ]; then
 	rm -rf ${BUILD_DIR}
 fi
-cp -R ${SOURCES_DIR} ${BUILD_ROOT}
+cp -R ${SOURCES_DIR} ${BUILD_ROOT}/Frameworks
 
 #----------------------------------------
 # Build
@@ -49,5 +49,9 @@ $IS_FREEBSD || $MAKE_CMD || exit 1
 $INSTALL_CMD
 if [ "$DEST_DIR" = "" ]; then
 	$PRIV_CMD ldconfig
-	$LN_CMD /usr/NextSpace/Frameworks/DesktopKit.framework/Resources/25-nextspace-fonts.conf /etc/fonts/conf.d/25-nextspace-fonts.conf
+  if ! [ $IS_FREEBSD ]; then
+    $LN_CMD /usr/NextSpace/Frameworks/DesktopKit.framework/Resources/25-nextspace-fonts.conf /etc/fonts/conf.d/25-nextspace-fonts.conf
+  else
+    $PRIV_CMD $LN_CMD $NEXTSPACE_ROOT/Frameworks/DesktopKit.framework/Resources/25-nextspace-fonts.conf $DEST_DIR/etc/fonts/conf.d/25-nextspace-fonts.conf
+  fi
 fi
