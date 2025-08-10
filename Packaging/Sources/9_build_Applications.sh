@@ -1,7 +1,9 @@
 #!/bin/sh
 
 . ../environment.sh
-. /etc/profile.d/nextspace.sh
+. "${PROJECT_DIR}/Core/nextspace${IS_FREEBSD:+-freebsd}.fsl"
+. "${GNUSTEP_MAKEFILES}/GNUstep.sh"
+. ${DEST_DIR}/etc/profile.d/nextspace.sh
 
 _PWD=`pwd`
 
@@ -50,7 +52,6 @@ git_remote_archive https://github.com/gnustep/apps-projectcenter ${PC_BUILD_DIR}
 #----------------------------------------
 # Build
 #----------------------------------------
-. /Developer/Makefiles/GNUstep.sh
 
 cd ${APP_BUILD_DIR}
 export CC=${C_COMPILER}
