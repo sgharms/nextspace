@@ -13,15 +13,17 @@ _PWD=`pwd`
 ${ECHO} ">>> Installing ${OS_ID} packages for NextSpace applications build"
 if [ ${OS_ID} = "debian" ] || [ ${OS_ID} = "ubuntu" ]; then
 	${ECHO} "Debian-based Linux distribution: calling 'apt-get install'."
-	sudo apt-get install -y ${APPS_BUILD_DEPS}
-	sudo apt-get install -y ${APPS_RUN_DEPS}
+	$PRIV_CMD apt-get install -y ${APPS_BUILD_DEPS}
+	$PRIV_CMD apt-get install -y ${APPS_RUN_DEPS}
+elif [ $IS_FREEBSD ]; then
+  # freebsd noop
 else
 	${ECHO} "RedHat-based Linux distribution: calling 'yum -y install'."
 	SPEC_FILE=${PROJECT_DIR}/Applications/nextspace-applications.spec
 	DEPS=`rpmspec -q --buildrequires ${SPEC_FILE} | grep -v "nextspace" | grep -v "corefoundation" | awk -c '{print $1}'`
-	sudo yum -y install ${DEPS} || exit 1
+	$PRIV_CMD yum -y install ${DEPS} || exit 1
 	DEPS=`rpmspec -q --requires ${SPEC_FILE} | grep -v corefoundation | grep -v nextspace`
-	sudo yum -y install ${DEPS} || exit 1
+	$PRIV_CMD yum -y install ${DEPS} || exit 1
 fi
 
 #----------------------------------------
@@ -33,19 +35,19 @@ GORM_BUILD_DIR=${BUILD_ROOT}/gorm-${gorm_version}
 PC_BUILD_DIR=${BUILD_ROOT}/projectcenter-${projectcenter_version}
 
 if [ -d ${APP_BUILD_DIR} ]; then
-	sudo rm -rf ${APP_BUILD_DIR}
+	$PRIV_CMD rm -rf ${APP_BUILD_DIR}
 fi
 cp -R ${SOURCES_DIR}/Applications ${BUILD_ROOT}
 
 # GORM
 if [ -d ${GORM_BUILD_DIR} ]; then
-	sudo rm -rf ${GORM_BUILD_DIR}
+	$PRIV_CMD rm -rf ${GORM_BUILD_DIR}
 fi
 git_remote_archive https://github.com/gnustep/apps-gorm ${GORM_BUILD_DIR} gorm-${gorm_version}
 
 # ProjectCenter
 if [ -d ${PC_BUILD_DIR} ]; then
-	sudo rm -rf ${PC_BUILD_DIR}
+	$PRIV_CMD rm -rf ${PC_BUILD_DIR}
 fi
 git_remote_archive https://github.com/gnustep/apps-projectcenter ${PC_BUILD_DIR} projectcenter-${projectcenter_version}
 
@@ -73,7 +75,7 @@ patch -p1 < ${SOURCES_DIR}/Libraries/gnustep/pc.patch
 $MAKE_CMD
 $INSTALL_CMD || exit
 
-sudo ldconfig
+$PRIV_CMD ldconfig
 
 #----------------------------------------
 # Post install
@@ -83,26 +85,26 @@ if [ "$DEST_DIR" = "" ] && [ "$GITHUB_ACTIONS" != "true" ]; then
 	systemctl --quiet is-active loginwindow.service
 	if [ $? -eq 0 ];then
 		${ECHO} "A Login panel is already running: refresh systemd unit info."
-		sudo systemctl daemon-reload
+		$PRIV_CMD systemctl daemon-reload
 	else
 		print_H2 "Setting up Login window service to run at system startup..."
 		systemctl --quiet is-active display-manager.service
 		if [ $? -eq 0 ];then
 			if [ -z $DISPLAY ];then
 				print_H2 "A session manager is already running: we must stop it now."
-				sudo systemctl stop display-manager.service
+				$PRIV_CMD systemctl stop display-manager.service
 			else
-				print_H1 "You're in graphical session.\nTo enable Login panel you need to execute the following commands in console:\n  $ sudo systemctl stop display-manager.service\n  $ sudo systemctl enable /usr/NextSpace/lib/systemd/loginwindow.service"
+				print_H1 "You're in graphical session.\nTo enable Login panel you need to execute the following commands in console:\n  $ $PRIV_CMD systemctl stop display-manager.service\n  $ $PRIV_CMD systemctl enable /usr/NextSpace/lib/systemd/loginwindow.service"
 			fi
 		else
 			systemctl --quiet is-enabled display-manager.service
 			if [ $? -eq 0 ];then
 				print_H2 "A session manager is already set: we must disable it now."
-				sudo systemctl disable display-manager.service
+				$PRIV_CMD systemctl disable display-manager.service
 			fi
 			${ECHO} "Setting up Login window service..."
-			sudo systemctl enable /usr/NextSpace/lib/systemd/loginwindow.service
-			sudo systemctl set-default graphical.target
+			$PRIV_CMD systemctl enable /usr/NextSpace/lib/systemd/loginwindow.service
+			$PRIV_CMD systemctl set-default graphical.target
 		fi
 	fi
 
@@ -111,7 +113,7 @@ if [ "$DEST_DIR" = "" ] && [ "$GITHUB_ACTIONS" != "true" ]; then
 		SELINUX_STATE=`grep "^SELINUX=.*" /etc/selinux/config | awk -F= '{print $2}'`
 		if [ "${SELINUX_STATE}" != "disabled" ]; then
 			${ECHO} -n "SELinux enabled - dissabling it..."
-			sudo sed -i -e ' s/SELINUX=.*/SELINUX=disabled/' /etc/selinux/config
+			$PRIV_CMD sed -i -e ' s/SELINUX=.*/SELINUX=disabled/' /etc/selinux/config
 			${ECHO} "done"
 			${ECHO} "Please reboot to apply changes."
 		fi
