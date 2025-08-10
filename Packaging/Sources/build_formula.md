@@ -87,4 +87,7 @@ gmake
 ```
 ## 9 Applications
 
-`NEXTSPACE_ROOT=/usr/local/NextSpace DEST_DIR=/usr/local BUILD_ROOT=/tmp/Build`
+`NEXTSPACE_ROOT=/usr/local/NextSpace DEST_DIR=/usr/local BUILD_ROOT=/tmp/Build
+sh 9_build_Applications.sh.`
+
+
