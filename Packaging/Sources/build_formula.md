@@ -78,7 +78,13 @@ NEXTSPACE_ROOT=/usr/local/NextSpace DEST_DIR=/usr/local BUILD_ROOT=/tmp/Build sh
 
 ### 8 Frameworks
 
-pkg install -y xorg-server libXcursor libXrandr libdbus
+`pkg install -y xorg-server libXcursor libXrandr libdbus`
+
+```shell
 gmake clean
-export ADDITIONAL_CPPFLAGS="$(pkg-config --cflags dbus-1)" ADDITIONAL_OBJCFLAGS="-DFREEBSD -UWITH_HAL"
+NEXTSPACE_ROOT=/usr/local/NextSpace DEST_DIR=/usr/local BUILD_ROOT=/tmp/Build ADDITIONAL_CPPFLAGS="$(pkg-config --cflags dbus-1)" ADDITIONAL_OBJCFLAGS="-DFREEBSD -UWITH_HAL" sh 8_build_Frameworks.sh
 gmake
+```
+## 9 Applications
+
+`NEXTSPACE_ROOT=/usr/local/NextSpace DEST_DIR=/usr/local BUILD_ROOT=/tmp/Build`
