@@ -23,3 +23,8 @@
 *.dir
 *~
 .build
+*.sw?
+Session.vim
+tags
+*.core
+BUILD_ROOT
