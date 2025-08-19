@@ -60,12 +60,16 @@ ECHO "OS:\t\t${OS_ID}-${OS_VERSION}"
 MACHINE=`uname -m`
 if [ -f /proc/device-tree/model ];then
 	MODEL=`cat /proc/device-tree/model | awk '{print $1}'`
+elif [ -n `command -v sysctl >/dev/null 2>&1` ]; then
+  MODEL=`sysctl -n hw.model 2>/dev/null`
 else
-	MODEL="unkown"
+	MODEL="unknown"
 fi
 
 if [ -f /proc/device-tree/compatible ];then
 	GPU=`tr -d '\0' < /proc/device-tree/compatible | awk -F, '{print $3}'`
+elif [ -n `command -v pciconf >/dev/null 2>&1` ]; then
+  GPU=`pciconf -lv | grep -B2 display | grep device | cut -d"'" -f2 2>/dev/null`
 else
 	GPU="unknown"
 fi
