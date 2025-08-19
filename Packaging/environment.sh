@@ -116,7 +116,7 @@ fi
 #----------------------------------------
 # Package dependencies
 #----------------------------------------
-if [ ${OS_ID} = "debian" ] || [ ${OS_ID} = "ubuntu" ]; then
+if [ ${OS_ID} = "debian" ] || [ ${OS_ID} = "ubuntu" ] || [ ${OS_ID} = "freebsd" ]; then
     . ./${OS_ID}-${OS_VERSION}.deps.sh || exit 1
 else
     prepare_redhat_environment
