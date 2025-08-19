@@ -181,7 +181,7 @@ else
   ${ECHO} "Using linker:\tGold"
 fi
 # Compiler
-if [ "$OS_ID" = "fedora" ] || [ "$OS_LIKE" = "rhel" ] || [ "$OS_ID" = "debian" ] || [ "$OS_ID" = "ubuntu" ] || [ "$OS_ID" = "ultramarine" ]; then
+if [ "$OS_ID" = "fedora" ] || [ "$OS_LIKE" = "rhel" ] || [ "$OS_ID" = "debian" ] || [ "$OS_ID" = "ubuntu" ] || [ "$OS_ID" = "ultramarine" ] || [ "$OS_ID" = "freebsd" ]; then
   which clang 2>&1 > /dev/null || { echo "No clang compiler found. Please install clang package."; exit 1; }
   C_COMPILER=`which clang`
   which clang++ 2>&1 > /dev/null || { echo "No clang++ compiler found. Please install clang++ package."; exit 1; }
