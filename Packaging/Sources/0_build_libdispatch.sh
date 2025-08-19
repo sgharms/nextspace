@@ -3,7 +3,7 @@
 . ../environment.sh
 
 #----------------------------------------
-# Install package dependecies
+# Install package dependencies
 #----------------------------------------
 ${ECHO} ">>> Installing ${OS_ID} packages for Grand Central Dispatch build"
 if [ "${OS_ID}" = "debian" ] || [ "${OS_ID}" = "ubuntu" ]; then
