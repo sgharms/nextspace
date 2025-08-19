@@ -86,5 +86,5 @@ $LN_CMD libdispatch.so.${libdispatch_version} libdispatch.so.${SHORT_VER}
 $LN_CMD libdispatch.so.${libdispatch_version} libdispatch.so
 
 if [ "$DEST_DIR" = "" ]; then
-	sudo ldconfig
+	$PRIV_CMD ldconfig
 fi
