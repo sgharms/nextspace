@@ -166,19 +166,24 @@ else
 fi
 
 # Linker
-ld -v | grep "gold" 2>&1 > /dev/null
-if [ "$?" = "1" ]; then
-  ${ECHO} "Setting up Gold linker..."
-  sudo update-alternatives --install /usr/bin/ld ld /usr/bin/ld.gold 100
-  sudo update-alternatives --install /usr/bin/ld ld /usr/bin/ld.bfd 10
-  sudo update-alternatives --auto ld
+
+# FreeBSD's default ld.lld is "a drop-in replacement for the GNU BFD and gold
+# linkers." per ld.lld(1)
+if [ "${OS_ID}" != "freebsd" ]; then
   ld -v | grep "gold" 2>&1 > /dev/null
   if [ "$?" = "1" ]; then
-    ${ECHO} "Failed to setup Gold linker"
-    exit 1
+    ECHO "Setting up Gold linker..."
+    $PRIV_CMD update-alternatives --install /usr/bin/ld ld /usr/bin/ld.gold 100
+    $PRIV_CMD update-alternatives --install /usr/bin/ld ld /usr/bin/ld.bfd 10
+    $PRIV_CMD update-alternatives --auto ld
+    ld -v | grep "gold" 2>&1 > /dev/null
+    if [ "$?" = "1" ]; then
+      ECHO "Failed to setup Gold linker"
+      exit 1
+    fi
+  else
+    ECHO "Using linker:\tGold"
   fi
-else
-  ${ECHO} "Using linker:\tGold"
 fi
 # Compiler
 if [ "$OS_ID" = "fedora" ] || [ "$OS_LIKE" = "rhel" ] || [ "$OS_ID" = "debian" ] || [ "$OS_ID" = "ubuntu" ] || [ "$OS_ID" = "ultramarine" ] || [ "$OS_ID" = "freebsd" ]; then
