@@ -26,7 +26,7 @@ projectcenter_version=0_7_0
 #----------------------------------------
 . /etc/os-release
 # OS type like "rhel"
-OS_LIKE=`echo ${ID_LIKE} | awk '{print $1}'`
+OS_LIKE=`ECHO ${ID_LIKE} | awk '{print $1}'`
 # OS name like "fedora"
 OS_ID=$ID
 _ID=`echo ${ID} | awk -F\" '{print $2}'`
@@ -41,7 +41,7 @@ if [ -n "${_VER}" ] && [ "${_VER}" != " " ]; then
 fi
 # Name like "Fedora Linux"
 OS_NAME=$NAME
-${ECHO} "OS:\t\t${OS_ID}-${OS_VERSION}"
+ECHO "OS:\t\t${OS_ID}-${OS_VERSION}"
 
 #---------------------------------------
 # Machine
@@ -65,7 +65,7 @@ fi
 # Directory where nextspace GitHub repo resides
 cd ../..
 PROJECT_DIR=`pwd`
-${ECHO} "NextSpace repo:\t${PROJECT_DIR}"
+ECHO "NextSpace repo:\t${PROJECT_DIR}"
 cd ${_PWD}
 
 if [ -z $BUILD_RPM ]; then
@@ -73,11 +73,11 @@ if [ -z $BUILD_RPM ]; then
   if [ ! -d ${BUILD_ROOT} ]; then
     mkdir ${BUILD_ROOT}
   fi
-  ${ECHO} "Build in:\t${BUILD_ROOT}"
+  ECHO "Build in:\t${BUILD_ROOT}"
 
   if [ "$1" != "" ];then
     DEST_DIR=${1}
-    ${ECHO} "Install in:\t${1}"
+    ECHO "Install in:\t${1}"
   else
     DEST_DIR=""
   fi
@@ -94,7 +94,7 @@ else
   mkdir -p $RPM_SOURCES_DIR
   mkdir -p $RPM_SPECS_DIR
 
-  ${ECHO} "RPMs directory:\t$RPMS_DIR"
+  ECHO "RPMs directory:\t$RPMS_DIR"
 fi
 
 . ../functions.sh
