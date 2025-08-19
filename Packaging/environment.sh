@@ -132,6 +132,11 @@ if type "gmake" 2>/dev/null >/dev/null ;then
 else
   MAKE_CMD=make
 fi
+
+if [ ${OS_ID} = "freebsd" ]; then
+  BSDMAKE_CMD=make
+fi
+
 #
 if [ "$1" != "" ];then
   INSTALL_CMD="${MAKE_CMD} install DESTDIR=${1}"
