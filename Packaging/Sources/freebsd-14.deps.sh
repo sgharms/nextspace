@@ -1,5 +1,1 @@
-BUILD_TOOLS="
-    curl
-    cmake
-    git
-"
+../../Installer/FreeBSD/freebsd-14.deps.sh
