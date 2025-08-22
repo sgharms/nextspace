@@ -21,6 +21,13 @@ RUNTIME_DEPS="
 
 WRASTER_DEPS="
   GraphicsMagick-1.3.43_3,1
+  giflib
+  png
+  jbigkit
+  tiff
+  webp
+  libXpm
+  tiff
 "
 
 GNUSTEP_GUI_DEPS="libsndfile"
@@ -37,3 +44,7 @@ APPS_RUN_DEPS="
 
 CORE_SYSTEM_DEPS="
     polkit "
+
+WRASTER_DEPS="
+  GraphicsMagick-1.3.43_3,1
+"
