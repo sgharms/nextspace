@@ -3,8 +3,43 @@
 . ../environment.sh
 
 #----------------------------------------
-# Install package dependecies
+# Install package dependencies
 #----------------------------------------
+if [ "${OS_ID}" = "freebsd" ]; then
+  LIBOBJC2_PORT_DIR="/usr/ports/lang/libobjc2/"
+  ROBIN_MAP_PORT_DIR="/usr/ports/devel/robin-map"
+
+  $PRIV_CMD pkg install -y ${BUILD_TOOLS} || exit 1
+  [ "$NEXTSPACE_HOME" ] || NEXTSPACE_HOME=/usr/local/NextSpace
+
+  [ -d $ROBIN_MAP_PORT_DIR ] || echo $(cat << EOF 1>&2
+FreeBSD installation relies on the ports(7) infrastructure.
+
+Please make sure you have cloned https://git.FreeBSD.org/ports.git
+EOF
+)
+
+  [ -d $LIBOBJC2_PORT_DIR ] || echo $(cat << EOF 1>&2
+FreeBSD installation relies on the ports(7) infrastructure.
+
+Please make sure you have cloned https://git.FreeBSD.org/ports.git
+EOF
+)
+
+  cd $ROBIN_MAP_PORT_DIR
+  make DEFAULT_VERSIONS+=ssl=openssl install
+
+  cd $LIBOBJC2_PORT_DIR
+  make DEFAULT_VERSIONS+=ssl=openssl install
+  $BSDMAKE_CMD install
+
+  if [ "$DEST_DIR" = "" ]; then
+    $PRIV_CMD ldconfig
+  fi
+
+  exit 0
+fi
+
 if [ ${OS_ID} != "debian" ] && [ ${OS_ID} != "ubuntu" ]; then
 	ECHO ">>> Installing ${OS_ID} packages for ObjC 2.0 runtime build"
 	ECHO "RedHat-based Linux distribution: calling 'yum -y install'."
