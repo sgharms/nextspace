@@ -10,7 +10,7 @@ if [ ${OS_ID} != "debian" ] && [ ${OS_ID} != "ubuntu" ]; then
 	ECHO "RedHat-based Linux distribution: calling 'yum -y install'."
 	SPEC_FILE=${PROJECT_DIR}/Libraries/libobjc2/libobjc2.spec
 	DEPS=`rpmspec -q --buildrequires ${SPEC_FILE} | grep -v "libdispatch-devel" | awk -c '{print $1}'`
-	sudo yum -y install ${DEPS} || exit 1
+	$PRIV_CMD yum -y install ${DEPS} || exit 1
 fi
 
 #----------------------------------------
@@ -77,5 +77,5 @@ if [ -f $DEST_DIR/usr/NextSpace/include/Block-libdispatch.h ]; then
 fi
 
 if [ "$DEST_DIR" = "" ]; then
-	sudo ldconfig
+	$PRIV_CMD ldconfig
 fi
