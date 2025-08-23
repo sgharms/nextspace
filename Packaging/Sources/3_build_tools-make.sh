@@ -5,12 +5,12 @@
 #----------------------------------------
 # Install package dependecies
 #----------------------------------------
-${ECHO} ">>> Installing ${OS_ID} packages for GNUstep Make build"
+ECHO ">>> Installing ${OS_ID} packages for GNUstep Make build"
 if [ ${OS_ID} = "debian" ] || [ ${OS_ID} = "ubuntu" ]; then
-	${ECHO} "Debian-based Linux distribution: calling 'apt-get install'."
+	ECHO "Debian-based Linux distribution: calling 'apt-get install'."
 	sudo apt-get install -y ${GNUSTEP_MAKE_DEPS} || exit 1
 else
-	${ECHO} "RedHat-based Linux distribution: calling 'yum -y install'."
+	ECHO "RedHat-based Linux distribution: calling 'yum -y install'."
 	SPEC_FILE=${PROJECT_DIR}/Core/nextspace-core.spec
 	DEPS=`rpmspec -q --buildrequires ${SPEC_FILE} | grep -v libobjc2 | grep -v "libdispatch-devel" | awk -c '{print $1}'`
 	sudo yum -y install ${DEPS} || exit 1
