@@ -188,3 +188,5 @@ if [ "$OS_ID" = "fedora" ] || [ "$OS_LIKE" = "rhel" ] || [ "$OS_ID" = "debian" ]
   which clang++ 2>&1 > /dev/null || { echo "No clang++ compiler found. Please install clang++ package."; exit 1; }
   CXX_COMPILER=`which clang++`
 fi
+
+GNUSTEP_CONFIG_CMD=$(find /usr -name gnustep-config | grep Tools | head -1)

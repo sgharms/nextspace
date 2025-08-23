@@ -6,3 +6,7 @@ BUILD_TOOLS="
 
 CORE_SYSTEM_DEPS="
     polkit "
+
+WRASTER_DEPS="
+  GraphicsMagick-1.3.43_3,1
+"
