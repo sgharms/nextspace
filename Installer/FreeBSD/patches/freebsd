@@ -1,0 +1,30 @@
+diff -ur work/libs-gui-gui-0_32_0/Source/NSFontManager.m my-work/libs-gui-gui-0_32_0/Source/NSFontManager.m
+--- Source/NSFontManager.m	2025-02-11 13:44:11.000000000 -0500
++++ Source/NSFontManager.m	2025-09-28 00:31:17.628013000 -0400
+@@ -1013,18 +1015,26 @@
+ 
+ - (BOOL) sendAction
+ {
+   NSApplication *theApp = [NSApplication sharedApplication];
+ 
+   if (_action)
+     {
+       /* FIXME - shouldn't we try our own delegate first ??  It seems
+        * what every programmer would expect, but it looks like Apple
+        * doesn't do it!  Or maybe they fixed it in recent releases ?
+        */
++      // Try delegate first (the missing logic from the FIXME)
++      if ([self delegate] && [[self delegate] respondsToSelector:_action])
++        {
++          NSDebugLLog(@"FontManager", @"Found the delegate");
++          [[self delegate] performSelector:_action withObject:self];
++          return YES;
++        }
++      
+       return [theApp sendAction: _action to: nil from: self];
+     }
+   else
+     {
+       return NO;
+     }
+ }
