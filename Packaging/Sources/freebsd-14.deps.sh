@@ -3,3 +3,6 @@ BUILD_TOOLS="
     cmake
     git
 "
+
+CORE_SYSTEM_DEPS="
+    polkit "
