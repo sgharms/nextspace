@@ -45,6 +45,12 @@ APPS_RUN_DEPS="
 CORE_SYSTEM_DEPS="
     polkit "
 
+RUNTIME_DEPS="
+    libuuid
+    libinotify
+    libxml2
+"
+
 WRASTER_DEPS="
   GraphicsMagick-1.3.43_3,1
 "
