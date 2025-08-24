@@ -22,18 +22,21 @@ find_path(GraphicsMagick_INCLUDE_DIR
   PATH_SUFFIXES GraphicsMagick
 )
 
+message(DEBUG, "Include-DIRS: ${GraphicsMagick_PKGCONF_INCLUDE_DIRS}")
+message(DEBUG, "Include-DIR: ${GraphicsMagick_INCLUDE_DIR}")
+
 # Finally the library itself
 find_library(GraphicsMagick_LIBRARY
   NAMES GraphicsMagick
   HINTS ${GraphicsMagick_PKGCONF_LIBRARY_DIRS}
 )
 
+message(DEBUG, "Library-DIRS: ${GraphicsMagick_PKGCONF_LIBRARY_DIRS}")
+message(DEBUG, "Library-DIR: ${GraphicsMagick_LIBRARY}")
+
 if(GraphicsMagick_PKGCONF_VERSION)
   set(GraphicsMagick_VERSION ${GraphicsMagick_PKGCONF_VERSION})
 endif()
 
-# Set the include dir variables and the libraries and let libfind_process do the rest.
-# NOTE: Singular variables for this library, plural for libraries this lib depends on.
 set(GraphicsMagick_PROCESS_INCLUDES ${GraphicsMagick_INCLUDE_DIR})
-set(GraphicsMagick_PROCESS_LIBS ${GraphicsMagick_LIBRARY})
-libfind_process(GraphicsMagick)
+set(GraphicsMagick_PROCESS_LIBS GraphicsMagick)
