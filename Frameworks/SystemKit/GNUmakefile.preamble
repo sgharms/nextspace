@@ -12,7 +12,7 @@
 ADDITIONAL_OBJCFLAGS += -W -Wall -Wno-import -Wno-unused -Wno-unused-parameter -pipe
 
 ifeq ($(findstring freebsd, $(GNUSTEP_TARGET_OS)), freebsd)
-  ADDITIONAL_OBJCFLAGS += -DFREEBSD -DWITH_HAL `pkg-config --cflags-only-other hal`
+  ADDITIONAL_OBJCFLAGS += -DFREEBSD
 endif
 
 ifeq ($(findstring gnu, $(GNUSTEP_TARGET_OS)), gnu)
@@ -28,10 +28,6 @@ ADDITIONAL_CFLAGS +=
 ### Additional include directories the compiler should search
 ADDITIONAL_INCLUDE_DIRS += -I../ -Iderived_src
 
-ifeq ($(findstring freebsd, $(GNUSTEP_TARGET_OS)), freebsd)
-  ADDITIONAL_INCLUDE_DIRS += `pkg-config --cflags hal`
-endif
-
 ifeq ($(findstring gnu, $(GNUSTEP_TARGET_OS)), gnu)
 #  ADDITIONAL_INCLUDE_DIRS += `pkg-config --cflags udisks2 dbus-1 upower-glib`
 #  ADDITIONAL_INCLUDE_DIRS += -I/usr/include/gio-unix-2.0
@@ -40,9 +36,6 @@ endif
 
 ### Additional flags to pass to the linker
 ADDITIONAL_LDFLAGS += -lXrandr -lxkbfile -lXcursor
-ifeq ($(findstring freebsd, $(GNUSTEP_TARGET_OS)), freebsd)
-  ADDITIONAL_LDFLAGS += `pkg-config --libs hal`
-endif
 
 ifeq ($(findstring gnu, $(GNUSTEP_TARGET_OS)), gnu)
 #  ADDITIONAL_LDFLAGS += `pkg-config --libs udisks2 dbus-1 upower-glib`
