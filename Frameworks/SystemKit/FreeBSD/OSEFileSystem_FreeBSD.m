@@ -39,6 +39,13 @@ struct kevent       events[1024]; // structure filled with kevent() call
 struct kevent       event_data[1024];
 NSMutableDictionary *_pathFDList = nil;
 
+@interface OSEFileSystem ()
+{
+  OSEFileSystem *monitorOwner;
+  NSMutableDictionary *threadDict;
+}
+@end
+
 // Local only additions
 @interface OSEFileSystem (FreeBSD)
 
