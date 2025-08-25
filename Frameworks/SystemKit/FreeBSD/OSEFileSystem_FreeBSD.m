@@ -22,6 +22,7 @@
 //
 
 #import <OSEFileSystem.h>
+#import <OSEFileSystemMonitor.h>
 
 #include <unistd.h>
 #include <stdio.h>
@@ -41,7 +42,7 @@ NSMutableDictionary *_pathFDList = nil;
 
 @interface OSEFileSystem ()
 {
-  OSEFileSystem *monitorOwner;
+  OSEFileSystemMonitor *monitorOwner;
   NSMutableDictionary *threadDict;
 }
 @end
@@ -78,7 +79,7 @@ NSMutableDictionary *_pathFDList = nil;
 	}
     }
 
-  monitorOwner = (OSEFileSystem *)[conn rootProxy];
+  monitorOwner = (OSEFileSystemMonitor *)[conn rootProxy];
 
   threadDict = [[NSThread currentThread] threadDictionary];
   [threadDict setValue:[NSNumber numberWithBool:NO] 
@@ -424,11 +425,13 @@ char *flags_to_string(int flags)
 		  event_data[i].data,
 		  [pathString cString]);
 
-	  [monitorOwner fileSystemEventsOccured:[self operationsFromEvents:opsList]
-	        			 atPath:pathString];
-	}
+    NSDictionary *event = @{
+      @"path": pathString,
+      @"operations": [self operationsFromEvents:opsList]
+    };
+    [monitorOwner handleEvent: event];
     }
-}
+}}
 
 @end
 
