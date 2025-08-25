@@ -176,7 +176,7 @@ NSMutableDictionary *_pathFDList = nil;
 
   // Increment LinkCount
   link_count++;
-  pathDict = [NSDictionary dictionaryWithObjectsAndKeys:
+  pathDict = [NSMutableDictionary dictionaryWithObjectsAndKeys:
     [NSNumber numberWithInt:path_fd], @"Descriptor",
     [NSNumber numberWithInt:link_count], @"LinkCount",
     nil];
