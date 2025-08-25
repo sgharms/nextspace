@@ -13,6 +13,7 @@ $(FRAMEWORK_NAME)_CURRENT_VERSION_NAME = 0.1
 $(FRAMEWORK_NAME)_DEPLOY_WITH_CURRENT_VERSION = yes
 
 # FreeBSD
+# This is a whole thing: 20250825: Acknowledging, and punting
 # ifeq ($(findstring freebsd, $(GNUSTEP_TARGET_OS)), freebsd)
 #   $(FRAMEWORK_NAME)_OBJC_FILES += $(wildcard FreeBSD/*.m)
 # endif
