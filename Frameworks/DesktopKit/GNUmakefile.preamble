@@ -2,6 +2,6 @@
 
 ADDITIONAL_INCLUDE_DIRS += -I../SystemKit/derived_src
 
-ADDITIONAL_OBJCFLAGS += -Wno-import -Wno-unused -pipe -Wno-format-security
+ADDITIONAL_OBJCFLAGS += -Wno-import -Wno-unused -pipe -Wno-format-security -I/usr/local/NextSpace/include
 
-ADDITIONAL_LDFLAGS += -L../SystemKit/SystemKit.framework -lSystemKit -lmagic
+ADDITIONAL_LDFLAGS += -L/usr/local/NextSpace/lib -L../SystemKit/SystemKit.framework -lSystemKit -lmagic -ldispatch
