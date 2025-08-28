@@ -52,7 +52,31 @@ if [ ${OS_ID} = "freebsd" ]; then
   cd $FOUNDATION_BEARING_PORT_DIR
   $BSDMAKE_CMD patch || exit 1
 
-  # Find the patched sub-tree and copy it to a place where we can hybridize
+  PATCHED_LIBDISPATCH_DIR=$(find work -type d -name swift-corelibs-libdispatch | head -1)
+  cd $PATCHED_LIBDISPATCH_DIR
+  rm -rf .build 2>/dev/null
+  mkdir -p .build
+  cd .build
+  C_FLAGS="-I${NEXTSPACE_HOME}/include -Wno-switch -Wno-enum-conversion"
+  $CMAKE_CMD .. \
+    -DCMAKE_C_COMPILER=${C_COMPILER} \
+    -DCMAKE_C_FLAGS="${C_FLAGS}" \
+    -DCMAKE_SHARED_LINKER_FLAGS="-L${NEXTSPACE_HOME}/lib -L/usr/local/lib -luuid" \
+    -DBUILD_SHARED_LIBS=YES \
+    -DCMAKE_INSTALL_PREFIX=${NEXTSPACE_HOME} \
+    -DCMAKE_INSTALL_LIBDIR=${NEXTSPACE_HOME}/lib \
+    -DCMAKE_LIBRARY_PATH=${NEXTSPACE_HOME}/lib \
+    \
+    -DCMAKE_SKIP_RPATH=ON \
+    -DCMAKE_BUILD_TYPE=Debug \
+    || exit 1
+
+  $MAKE_CMD || exit 1
+  $PRIV_CMD $BSDMAKE_CMD install || exit 1
+
+  # Find the ports(7)-patched sub-tree and copy it to a place where we can
+  # hybridize
+  cd $FOUNDATION_BEARING_PORT_DIR
   PATCHED_CF_DIR=$(find work -type d -name CoreFoundation | head -1)
   TEMP_DIR="${TMPDIR:-/tmp}/corefoundation-hybrid" # (-theory). Pour one out for Chester Bennington
   rm -rf $TEMP_DIR && mkdir -p $TEMP_DIR || exit 1
@@ -63,30 +87,30 @@ if [ ${OS_ID} = "freebsd" ]; then
   # The SHA is where trunkmaster started stacking changes on main
   TRUNKMASTER_PATCHES_DIR="/tmp/cf-friend-patches.$$"
   TRUNKMASTER_FORK_SHA="dbca8c7ddcfd19f7f6f6e1b60fd3ee3f748e263c"
-  rm -rf ${TRUNKMASTER_PATCHES_DIR}
-  git format-patch -o ${TRUNKMASTER_PATCHES_DIR} ${TRUNKMASTER_FORK_SHA}..@
+  ECHO "Writing patches to ${TRUNKMASTER_PATCHES_DIR}"
+  git format-patch -o ${TRUNKMASTER_PATCHES_DIR} ${TRUNKMASTER_FORK_SHA}..HEAD
+
+  # This patch does not apply cleanly as it appears to have been already
+  # applied
+  rm ${TRUNKMASTER_PATCHES_DIR}/0002-Added-implementation-of-CFFileDescriptor.patch
 
   # Test patches
   cd $TEMP_DIR
-  git init .
-  git add .
-  git commit -m 'Initial commit: Swift-extracted CoreFoundation'
+  GIT_PREFIX="-c user.name=\"$(id -un)\" -c user.email=\"$(id -un)@localhost.domain\""
+  git $GIT_PREFIX init .
+  git $GIT_PREFIX add .
+  git $GIT_PREFIX commit -m 'Initial commit: Swift-extracted CoreFoundation'
 
   # Apply the TM patches and ignore non-zero exit status (see below)
-  git apply --reject -p1 ${TRUNKMASTER_PATCHES_DIR}/* || true
-
-  # Remove rejections. The swift510 port integrated these changes and
-  # thus they are inapplicable.
-  find . -name \*.rej -exec rm {} \;
+  git $GIT_PREFIX apply --reject -p1 ${TRUNKMASTER_PATCHES_DIR}/* || true
 
   # Commit up. Even if it's ephemeral, it's useful for debugging
-  git add .
-  git commit -am 'Patch reconciliation complete'
-
   # Apply custom FreeBSD patches
   ECHO "Apply FreeBSD patch"
   CF_PATCH_PATH="${FREEBSD_PATCHES_PARENT_DIR}/freebsd_patches/0001-CoreFoundation_RunLoop.subproj_CFFileDescriptor.h.patch"
   git apply ${CF_PATCH_PATH}
+  git $GIT_PREFIX add .
+  git $GIT_PREFIX commit -am 'trunkmaster/FreeBSD Patch reconciliation complete'
 
   $MV_CMD "${BUILD_ROOT}/${CF_PKG_NAME}" "${BUILD_ROOT}/${CF_PKG_NAME}-orig"
   $MKDIR_CMD "${BUILD_ROOT}/${CF_PKG_NAME}"
