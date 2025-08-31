@@ -38,4 +38,7 @@ BACK_ART_DEPS="
 
 APPS_RUN_DEPS="
  icu
+ urwfonts
+ noto-basic
+ noto-emoji
 "

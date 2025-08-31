@@ -71,3 +71,14 @@ echo "Installed $(basename $PORT_SOURCE_DIR)"
 if [ "$DEST_DIR" = "" ]; then
   $PRIV_CMD ldconfig -R
 fi
+
+ECHO "$(tput setaf 3 bold)MANUAL INTERVENTION REQUIRED!"
+ECHO "$(tput sgr0)"
+ECHO "In your rc file, launch the GNUStep PasteBoard Service (gpbs)"
+ECHO "and distributed notifications center (gdnc)"
+ECHO ""
+ECHO "/usr/local/Library/bin/gpbs"
+ECHO "/usr/local/Library/bin/gdnc"
+ECHO ""
+ECHO "$(tput setaf 3 bold)END TRANSMISSION"
+ECHO "$(tput sgr0)"
