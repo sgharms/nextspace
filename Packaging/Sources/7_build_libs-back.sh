@@ -27,7 +27,7 @@ FreeBSD installation relies on the ports(7) infrastructure.
 Please make sure you have cloned https://git.FreeBSD.org/ports.git
 EOF
 )
-  [ "$PORTS_MAKE_ARGS" ] || PORTS_MAKE_ARGS="DEFAULT_VERSIONS+=ssl=openssl NO_DEPENDS=1"
+  [ "$PORTS_MAKE_ARGS" ] || PORTS_MAKE_ARGS="DEFAULT_VERSIONS+=ssl=openssl"
 fi
 
 #----------------------------------------
