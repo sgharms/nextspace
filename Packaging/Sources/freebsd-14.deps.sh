@@ -11,6 +11,7 @@ CORE_SYSTEM_DEPS="
 
 RUNTIME_DEPS="
     libuuid
+    libinotify
 "
 
 WRASTER_DEPS="
