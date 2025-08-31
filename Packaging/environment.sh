@@ -141,8 +141,12 @@ fi
 if [ "$1" != "" ];then
   INSTALL_CMD="${MAKE_CMD} install DESTDIR=${1}"
 else
-  if [ "${PRIV_CMD}" = "sudo" ]; then
+  if [ "$(id -u)" = 0 ]; then
+    INSTALL_CMD="${MAKE_CMD} install"
+  elif [ "${PRIV_CMD}" = "sudo" ]; then
     INSTALL_CMD="${PRIV_CMD} -E ${MAKE_CMD} install"
+  else
+    INSTALL_CMD="${PRIV_CMD} ${MAKE_CMD} install"
   fi
 fi
 
