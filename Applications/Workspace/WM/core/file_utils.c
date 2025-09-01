@@ -43,9 +43,6 @@
 #define PATH_MAX 1024
 #endif
 
-#ifdef HAVE_SECURE_GETENV
-#include <stdlib.h>
-#endif
 
 static char *_homeDirectory()
 {
@@ -56,11 +53,7 @@ static char *_homeDirectory()
   if (home)
     return home;
 
-#ifdef HAVE_SECURE_GETENV
-  tmp = secure_getenv("HOME");
-#else
   tmp = getenv("HOME");
-#endif
   if (tmp) {
     home = wstrdup(tmp);
     return home;
