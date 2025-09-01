@@ -198,7 +198,7 @@ static void _showWorkspaceName(WScreen *scr, int workspace)
 #ifdef USE_XRANDR
       px = xx;
 #else
-      px = (scr->scr_width - (w + 4)) / 2;
+      px = (scr->width - (w + 4)) / 2;
 #endif
       py = WORKSPACE_NAME_DISPLAY_PADDING;
       break;
@@ -206,7 +206,7 @@ static void _showWorkspaceName(WScreen *scr, int workspace)
 #ifdef USE_XRANDR
       px = xx;
 #else
-      px = (scr->scr_width - (w + 4)) / 2;
+      px = (scr->width - (w + 4)) / 2;
 #endif
       py = scr->height - (h + 4 + WORKSPACE_NAME_DISPLAY_PADDING);
       break;
@@ -232,8 +232,8 @@ static void _showWorkspaceName(WScreen *scr, int workspace)
       px = xx;
       py = yy;
 #else
-      px = (scr->scr_width - (w + 4)) / 2;
-      py = (scr->scr_height - (h + 4)) / 2;
+      px = (scr->width - (w + 4)) / 2;
+      py = (scr->height - (h + 4)) / 2;
 #endif
       break;
   }
