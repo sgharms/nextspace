@@ -21,7 +21,7 @@ SUBPROJECTS = \
 	Modules/Screen \
 	Modules/Keyboard \
 	Modules/Mouse \
-	Modules/Sound \
+#	Modules/Sound \
 	Modules/Services \
 	Modules/Expert
 #	Modules/Menu \
