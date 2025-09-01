@@ -20,7 +20,11 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
+#ifndef __FreeBSD__
 #include <termio.h>
+#else
+#include <termios.h>
+#endif
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
