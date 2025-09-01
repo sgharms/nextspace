@@ -35,7 +35,6 @@
 #import <Foundation/Foundation.h>
 #import <SystemKit/OSEDefaults.h>
 #import <DesktopKit/NXTAlert.h>
-#import <SoundKit/NXTSound.h>
 #import <SystemKit/OSEScreen.h>
 #import <SystemKit/OSESystemInfo.h>
 #import <SystemKit/OSEKeyboard.h>
@@ -340,14 +339,7 @@ int WSRunAlertPanel(char *title, char *message, char *defaultButton, char *alter
 extern void wShakeWindow(WWindow *wwin);
 void WSRingBell(WWindow *wwin)
 {
-  OSEDefaults *defs = [OSEDefaults globalUserDefaults];
-  NSString *beepType = [defs objectForKey:@"NXSystemBeepType"];
-
-  if (beepType && [beepType isEqualToString:@"Visual"]) {
-    wShakeWindow(wwin);
-  } else {
-    [[NSApp delegate] ringBell];
-  }
+  return;
 }
 
 void WSMessage(char *fmt, ...)

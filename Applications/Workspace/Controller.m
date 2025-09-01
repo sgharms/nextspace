@@ -431,12 +431,6 @@ static NSString *WMComputerShouldGoDownNotification = @"WMComputerShouldGoDownNo
   // [systemPower stopEventsMonitor];
   // [systemPower release];
 
-  // System Beep
-  if (bellSound) {
-    [bellSound stop];
-    [bellSound release];
-  }
-
   // Controller (NSWorkspace) objects
   TEST_RELEASE(_wrappers);
   TEST_RELEASE(_iconMap);
@@ -1481,18 +1475,7 @@ static NSString *WMComputerShouldGoDownNotification = @"WMComputerShouldGoDownNo
 // static NSTimer  *soundTimer = nil;
 - (void)ringBell
 {
-  if (bellSound == nil) {
-    OSEDefaults *defs = [OSEDefaults globalUserDefaults];
-    NSString *bellPath = [defs objectForKey:@"NXSystemBeep"];
-    if (bellPath == nil || [[NSFileManager defaultManager] fileExistsAtPath:bellPath] == NO) {
-      bellPath = @"/usr/NextSpace/Sounds/Bonk.snd";
-    }
-    bellSound = [[NXTSound alloc] initWithContentsOfFile:bellPath
-                                             byReference:YES
-                                              streamType:SNDEventType];
-  }
-
-  [bellSound play];
+  return;
 }
 
 @end
