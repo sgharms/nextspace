@@ -22,3 +22,7 @@ ADDITIONAL_LIB_DIRS +=
 
 ADDITIONAL_GUI_LIBS +=
 
+ifeq ($(findstring freebsd,$(GNUSTEP_TARGET_OS)),freebsd)
+  ADDITIONAL_CPPFLAGS += -I/usr/local/NextSpace/include -F/usr/local/NextSpace/Frameworks
+  ADDITIONAL_LDFLAGS  += -L/usr/local/NextSpace/lib -ldispatch
+endif

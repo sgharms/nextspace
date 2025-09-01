@@ -67,5 +67,11 @@ ADDITIONAL_OBJCFLAGS += -Wall -D$(subst -,_,$(GNUSTEP_HOST_OS)) -Wno-pointer-sig
 
 Terminal_LDFLAGS = -lutil -lDesktopKit -lSystemKit -lX11 -ldispatch
 
+ifeq ($(findstring freebsd,$(GNUSTEP_TARGET_OS)),freebsd)
+  ADDITIONAL_CPPFLAGS += -I/usr/local/NextSpace/include
+  ADDITIONAL_LDFLAGS  += -L/usr/local/NextSpace/lib -L/usr/local/lib
+	Terminal_LDFLAGS    += -liconv
+endif
+
 include $(GNUSTEP_MAKEFILES)/aggregate.make
 include $(GNUSTEP_MAKEFILES)/application.make

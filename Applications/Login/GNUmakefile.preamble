@@ -21,3 +21,7 @@ ADDITIONAL_INCLUDE_DIRS += `pkg-config --cflags upower-glib`
 # Additional library directories the linker should search
 ADDITIONAL_LIB_DIRS += -L/usr/X11R6/lib 
 
+ifeq ($(findstring freebsd,$(GNUSTEP_TARGET_OS)),freebsd)
+  ADDITIONAL_CPPFLAGS += -I/usr/local/NextSpace/include
+  ADDITIONAL_LDFLAGS  += -L/usr/local/NextSpace/lib
+endif
