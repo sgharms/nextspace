@@ -29,7 +29,13 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <fcntl.h>
+#ifndef __FreeBSD__
 #include <pty.h>
+#else
+#include <sys/types.h>
+#include <sys/ioctl.h>
+#include <libutil.h>
+#endif
 #include <sys/wait.h>
 
 #import <AppKit/AppKit.h>
