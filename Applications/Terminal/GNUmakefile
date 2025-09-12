@@ -14,11 +14,14 @@ PACKAGE_NAME = Terminal
 VERSION = 0.98
 Terminal_APPLICATION_ICON = Terminal.tiff
 Terminal_MAIN_MODEL_FILE = Terminal.gorm
+Terminal_PRINCIPAL_CLASS = TerminalApplication
+
 
 SUBPROJECTS = Preferences
 
 Terminal_OBJC_FILES = \
 	main.m \
+	TerminalApplication.m \
 	Controller.m \
 	\
 	Defaults.m\
