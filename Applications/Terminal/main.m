@@ -48,9 +48,68 @@
 - (void)sendEvent:(NSEvent *)e
 {
   if ([e type] == NSKeyDown && [e modifierFlags] & NSCommandKeyMask &&
-      [[Defaults shared] alternateAsMeta]) {
+			[[Defaults shared] alternateAsMeta])
+  {
     NSDebugLLog(@"key", @"intercepting key equivalent");
-    [[e window] sendEvent:e];
+
+    if ([[Defaults shared] alternateAsMeta] &&
+        [[[NSUserDefaults standardUserDefaults] objectForKey:@"PreserveReadlineWordMovement"] boolValue])
+		{
+      NSDebugLLog(@"key", @"Steven Terminal.app ergonomics");
+
+      if ([[e characters] length] == 1)
+      {
+        unichar c = [[e characters] characterAtIndex:0];
+				NSDebugLLog(@"key", @"Saw %hu", c);
+
+        // Preserve readline-esque Meta+f and Meta+b for whole-word operations
+        if ((c == 'f' || c == 'b') && !([e modifierFlags] & NSShiftKeyMask))
+        {
+          NSString *metaSeq = [NSString stringWithFormat:@"\033%c", c];
+
+          NSEvent *escEvent =
+            [NSEvent keyEventWithType:NSKeyDown
+                             location:[e locationInWindow]
+                        modifierFlags:0
+                            timestamp:[e timestamp]
+                         windowNumber:[e windowNumber]
+                              context:[e context]
+                           characters:metaSeq
+          charactersIgnoringModifiers:metaSeq
+                            isARepeat:[e isARepeat]
+                              keyCode:[e keyCode]];
+
+          [super sendEvent:escEvent];
+          return; // swallow original Alt+f / Alt+b
+        }
+      }
+			else // char length > 1
+			{
+				[[e window] sendEvent:e];
+			}
+		} // wasn't alt-as-meta; no PreserveReadlineWordMovement default
+  } // was a keyDown menu equivalent
+
+  if ([e type] == NSKeyDown && 
+			[[Defaults shared] alternateAsMeta] &&
+      ([e keyCode] == (NSNumber *)[[Defaults shared] superKeyKeycode]) &&
+      [[Defaults shared] swallowSuperKey] &&
+      [[e characters] length] == 1)
+  {
+    /* Swallow the super key (used to Super + Tab to change applications)
+     *
+     * This works because we don't pass the event down into the [e window], but
+     * rather let the event bubble /up/ to the desktop layer
+     *
+     */
+    NSLog(@"saw super key KEYDOWN");
+
+    NSDebugLLog(@"key", @"AAA: got key flags=%08lx  repeat=%i '%@' '%@' %4i %04x %lu %04x %lu\n",
+              [e modifierFlags], [e isARepeat], [e characters], [e charactersIgnoringModifiers],
+              [e keyCode], [[e characters] characterAtIndex:0], [[e characters] length],
+              [[e charactersIgnoringModifiers] characterAtIndex:0],
+              [[e charactersIgnoringModifiers] length]);
+    NSDebugLLog(@"key", @"Done");
     return;
   }
 
