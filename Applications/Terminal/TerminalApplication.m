@@ -75,7 +75,7 @@
 
   if ([e type] == NSKeyDown && 
 			[[Defaults shared] alternateAsMeta] &&
-      ([e keyCode] == (NSNumber *)[[Defaults shared] superKeyKeycode]) &&
+      ([e keyCode] == (unsigned long)[[Defaults shared] superKeyKeycode]) &&
       [[Defaults shared] swallowSuperKey] &&
       [[e characters] length] == 1)
   {
