@@ -95,6 +95,23 @@
       return;
     }
   } // was a keyDown menu equivalent
+
+    // Frustratingly, GNUstep is issuing Paste on Control+V, but I only want it
+    // on Control + Shift + V (which it does). Swallow Control + V
+    if ([e modifierFlags] & NSControlKeyMask)
+    {
+      unichar c = [[e characters] characterAtIndex:0];
+      NSDebugLLog(@"key", @"Testing unichar %hu", c);
+      if ([[e characters] length] == 1)
+      {
+        if (c == 'v')
+        {
+          NSDebugLLog(@"key", @"Discarding bogus ^v as paste versus acceptable ^V");
+          return;
+        }
+      }
+    }
+
   [super sendEvent:e];
 }
 
