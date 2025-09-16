@@ -42,7 +42,7 @@ ifeq ($(findstring freebsd,$(GNUSTEP_TARGET_OS)),freebsd)
   ADDITIONAL_LDFLAGS  += -linotify
 endif
 
-ifeq ($(findstring freebsd,$(GNUSTEP_TARGET_OS)),gnu)
+ifeq ($(findstring gnu,$(GNUSTEP_TARGET_OS)),gnu)
   ADDITIONAL_CPPFLAGS += -DLINUX
   ADDITIONAL_LDFLAGS  += -lbsd
 endif
