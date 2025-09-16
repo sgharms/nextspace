@@ -29,14 +29,27 @@ ADDITIONAL_GUI_LIBS += -lSystemKit -lDesktopKit -lSoundKit -lX11 -lCoreFoundatio
 # Window manager addons
 #
 ADDITIONAL_CFLAGS += -DHAVE_CONFIG_H -DWITH_GNUSTEP -fno-strict-aliasing -fblocks
-ADDITIONAL_CFLAGS += -DNDEBUG -D_XOPEN_SOURCE=600 -D_GNU_SOURCE
+ADDITIONAL_CFLAGS += -DNDEBUG -D_GNU_SOURCE
+
+# Add -D_XOPEN_SOURCE=600 only if target OS looks like GNU/Linux
+ADDITIONAL_CPPFLAGS += $(if $(findstring gnu,$(GNUSTEP_TARGET_OS)),-D_XOPEN_SOURCE=600)
+
 ADDITIONAL_INCLUDE_DIRS += -I./$(WM_DIR) -I./$(WM_DIR)/core
 ADDITIONAL_INCLUDE_DIRS += `pkg-config --cflags fontconfig`
 ADDITIONAL_GUI_LIBS += -lfontconfig -lXft -lwraster -lXext -lXrandr -lXfixes -lXcursor
 ADDITIONAL_GUI_LIBS += -lXrender -lXdamage -lXcomposite
 
 ifeq ($(findstring freebsd,$(GNUSTEP_TARGET_OS)),freebsd)
-  ADDITIONAL_CPPFLAGS += -I/usr/local/NextSpace/include -F/usr/local/NextSpace/Frameworks/
+  LOCALBASE ?= /usr/local
+  ADDITIONAL_CPPFLAGS  = -DREVISION=\"$(REVISION)\" -DLINUX
+  ADDITIONAL_CPPFLAGS += -DAPP_ICON=\"$($(APP_NAME)_APPLICATION_ICON)\"
+
+  ADDITIONAL_CPPFLAGS += -I${LOCALBASE}/NextSpace/include
+  ADDITIONAL_CPPFLAGS += -I${LOCALBASE}include -F${LOCALBASE}/Frameworks/ -F/usr/local/GNUstep/System/Library/Frameworks
+  ADDITIONAL_CPPFLAGS += -F${LOCALBASE}/NextSpace/Frameworks
+  ADDITIONAL_CPPFLAGS += -include fcntl.h
+
+
   ADDITIONAL_LDFLAGS  += -L/usr/local/NextSpace/lib
   # libinotify shim
   ADDITIONAL_LDFLAGS  += -linotify
