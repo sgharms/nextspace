@@ -639,8 +639,31 @@ static BOOL hyphenationSupported(void)
 
   if (isRichText)
     {
+#ifdef SGHARMS_ENABLE_ENV_VAR_FONT_SPECIFICATION
+      NSLog(@"Reading font information from environment.");
+      char *preferredFont     = getenv("TEXTEDIT_RT_PREF_FONT");
+      char *preferredFontSize = getenv("TEXTEDIT_RT_PREF_FONT_SIZE");
+
+      if (preferredFont && preferredFontSize)
+      {
+        NSString *convPreferredFont = [NSString stringWithUTF8String: preferredFont];
+        CGFloat size = (CGFloat)atof(preferredFontSize);
+
+        NSLog(@"Preferred font from environment is: %s [%@] @ %s", preferredFont, convPreferredFont, preferredFontSize);
+
+        [textAttributes setObject:[NSFont fontWithName:convPreferredFont size:size]
+                           forKey:NSFontAttributeName];
+      }
+      else
+      {
+      NSLog(@"Declined environment-based font configuration due to nullity of an expected variable.");
       [textAttributes setObject:[Preferences objectForKey: RichTextFont]
                          forKey:NSFontAttributeName];
+      }
+#else
+      [textAttributes setObject:[Preferences objectForKey: RichTextFont]
+                         forKey:NSFontAttributeName];
+#endif
 
       [textAttributes setObject:[NSParagraphStyle defaultParagraphStyle]
                          forKey:NSParagraphStyleAttributeName];
