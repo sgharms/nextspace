@@ -227,7 +227,45 @@ static BOOL changingRTFFont = NO;
     showFontInField ([displayedValues objectForKey: PlainTextFont], plainTextFontNameField);
   }
   [self commitDisplayedValues];
+
+	NSArray *responders = [self findRespondersForAction:@selector(changeFont:)];
+	for (NSResponder *responder in responders) {
+			if ([responder isKindOfClass:[NSTextView class]]) {
+					[responder changeFont:fontManager];
+			}
+	}
+
+	[[NSFontPanel sharedFontPanel] orderOut:self];
 }
+
+- (NSArray *)findRespondersForAction:(SEL)action {
+    NSMutableArray *responders = [NSMutableArray array];
+
+    // Check all windows, not just key window
+    NSArray *windows = [NSApp windows];
+    for (NSWindow *window in windows) {
+        NSResponder *responder = [window firstResponder];
+        while (responder) {
+            if ([responder respondsToSelector:action]) {
+                [responders addObject:responder];
+            }
+            responder = [responder nextResponder];
+        }
+    }
+
+    // Also check app-level responders
+    NSResponder *appResponder = [NSApp nextResponder];
+    while (appResponder) {
+        if ([appResponder respondsToSelector:action]) {
+            [responders addObject:appResponder];
+        }
+        appResponder = [appResponder nextResponder];
+    }
+
+		NSLog(@"findRespondersForAction ends with %lu responders.", [responders count]);
+    return responders;
+}
+
 
 /**** Commit/revert etc ****/
 
