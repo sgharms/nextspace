@@ -335,6 +335,10 @@ static NSPanel *fontPanel = nil;
                          size:[self _getFloatDefault:fontSizeKey]];
 
   fontManager = [NSFontManager sharedFontManager];
+#ifdef __FreeBSD__
+  NSDebugLLog(@"BSD", @"Enabled Custom FreeBSD delegate setting");
+  [fontManager setDelegate: self];
+#endif
   [fontManager setSelectedFont:font isMultiple:NO];
   if (!fontPanel) {
     fontPanel = [fontManager fontPanel:YES];
