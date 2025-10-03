@@ -4,7 +4,7 @@
 ADDITIONAL_CPPFLAGS += 
 
 # Additional flags to pass to Objective C compiler
-ADDITIONAL_OBJCFLAGS += 
+ADDITIONAL_OBJCFLAGS += -g2 -O0
 
 # Additional flags to pass to C compiler
 ADDITIONAL_CFLAGS += 
