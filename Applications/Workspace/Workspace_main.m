@@ -25,6 +25,8 @@
 #import <SystemKit/OSEScreen.h>
 #import <SystemKit/OSEDefaults.h>
 
+#include <unistd.h>
+
 #import "Application.h"
 #import "Recycler.h"
 #import "Workspace+WM.h"
@@ -131,6 +133,12 @@ int main(int argc, const char **argv)
             getenv("DISPLAY"));
     exit(1);
   }
+
+ /*
+  * Resolves race condition when testing for display twice in too narrow of a
+  * time window.
+  */
+	usleep(100000);
 
   if (_isWindowManagerRunning() == YES) {
     fprintf(stderr, "[Workspace] Error: other window manager already running. Quitting...\n");
