@@ -162,6 +162,10 @@ int main(int argc, const char **argv)
     //--- Initialize Window Manager
     fprintf(stderr, "=== Initializing Window Manager ===\n");
     dispatch_sync(window_manager_q, ^{
+        /* Context: This initializes an inert desktop with X primitive logic:
+         *
+         * The event loops enable event handling.
+         */
       wInitialize(argc, (char **)argv);
       wStartUp(True);
 
