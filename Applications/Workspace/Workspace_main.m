@@ -148,11 +148,15 @@ int main(int argc, const char **argv)
   fprintf(stderr, "=== Starting Workspace ===\n");
   workspace_q = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0);
   dispatch_sync(workspace_q, ^{
+#ifndef __FreeBSD__
     @autoreleasepool {
+#endif
       // Restore display layout
       OSEScreen *screen = [OSEScreen sharedScreen];
       [screen applySavedDisplayLayout];
+#ifndef __FreeBSD__
     }
+#endif
   });
   {
     // DISPATCH_QUEUE_CONCURRENT is mandatory for CFRunLoop run.
