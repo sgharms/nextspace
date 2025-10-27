@@ -30,6 +30,8 @@ ADDITIONAL_GUI_LIBS += -lSystemKit -lDesktopKit -lSoundKit -lX11 -lCoreFoundatio
 #
 ADDITIONAL_CFLAGS += -DHAVE_CONFIG_H -DWITH_GNUSTEP -fno-strict-aliasing -fblocks
 ADDITIONAL_CFLAGS += -DNDEBUG -D_GNU_SOURCE
+ADDITIONAL_CFLAGS += -DUSE_XRANDR
+
 
 # Add -D_XOPEN_SOURCE=600 only if target OS looks like GNU/Linux
 ADDITIONAL_CPPFLAGS += $(if $(findstring gnu,$(GNUSTEP_TARGET_OS)),-D_XOPEN_SOURCE=600)
