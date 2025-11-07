@@ -84,7 +84,7 @@ ECHO "NextSpace repo:\t${PROJECT_DIR}"
 cd ${_PWD}
 
 if [ -z $BUILD_RPM ]; then
-  BUILD_ROOT="${_PWD}/BUILD_ROOT"
+  BUILD_ROOT="${BUILD_ROOT:=${_PWD}/BUILD_ROOT}"
   if [ ! -d ${BUILD_ROOT} ]; then
     mkdir ${BUILD_ROOT}
   fi
