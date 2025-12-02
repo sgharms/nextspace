@@ -44,7 +44,7 @@ cd ${BUILD_DIR}
 	--with-name=art \
 	|| exit 1
 
-$MAKE_CMD || exit 1
+$MAKE_CMD -j${CPU_COUT} || exit 1
 
 #----------------------------------------
 # Install

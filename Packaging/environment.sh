@@ -135,6 +135,7 @@ fi
 
 if [ ${OS_ID} = "freebsd" ]; then
   BSDMAKE_CMD=make
+  CPU_COUNT=$(sysctl -n hw.ncpu 2>/dev/null || echo 1)
 fi
 
 #

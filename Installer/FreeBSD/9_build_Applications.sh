@@ -57,7 +57,7 @@ cd ${APP_BUILD_DIR}
 export CC=${C_COMPILER}
 export CMAKE=${CMAKE_CMD}
 $MAKE_CMD clean
-$MAKE_CMD || exit 1
+$MAKE_CMD -j${CPU_COUT} || exit 1
 $INSTALL_CMD || exit
 
 export GNUSTEP_INSTALLATION_DOMAIN=NETWORK

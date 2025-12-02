@@ -34,7 +34,7 @@ cp -R ${SOURCES_DIR} ${BUILD_ROOT}
 cd ${BUILD_DIR}
 
 $MAKE_CMD clean
-$MAKE_CMD || exit 1
+$MAKE_CMD -j${CPU_COUT} || exit 1
 
 #----------------------------------------
 # Install
