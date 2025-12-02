@@ -1,6 +1,7 @@
 #!/bin/sh
 
 CURPWD=${PWD}
+BUILD_ROOT="${CURPWD}/BUILD_ROOT"
 cd ../../Packaging/Sources
 .  ../environment.sh
 cd $CURPWD
@@ -85,6 +86,7 @@ TRUNKMASTER_PATCHES_DIR="/tmp/cf-friend-patches.$$"
 # The SHA is where trunkmaster started stacking changes on main
 TRUNKMASTER_FORK_SHA="dbca8c7ddcfd19f7f6f6e1b60fd3ee3f748e263c"
 ECHO "Writing patches to ${TRUNKMASTER_PATCHES_DIR} from ${PWD}"
+BUILD_ROOT="${CURPWD}/BUILD_ROOT"
 git format-patch -o ${TRUNKMASTER_PATCHES_DIR} ${TRUNKMASTER_FORK_SHA}..HEAD
 
 # This patch does not apply cleanly as it appears to have been already

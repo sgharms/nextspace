@@ -1,6 +1,7 @@
 #!/bin/sh
 
 CURPWD=${PWD}
+BUILD_ROOT="${CURPWD}/BUILD_ROOT"
 cd ../../Packaging/Sources
 .  ../environment.sh
 cd $CURPWD
