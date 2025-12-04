@@ -9,7 +9,7 @@ BUILD_TOOLS="
 
 CORE_SYSTEM_DEPS="
     polkit
-    Xorg
+    xorg
     xrandr
 "
 
