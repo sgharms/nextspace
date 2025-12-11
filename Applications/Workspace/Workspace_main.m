@@ -26,6 +26,7 @@
 #import <SystemKit/OSEDefaults.h>
 
 #include <unistd.h>
+#include <pthread.h>
 
 #import "Application.h"
 #import "Recycler.h"
@@ -199,17 +200,25 @@ int main(int argc, const char **argv)
     // Start WM run loop V0 to catch events while V1 is warming up.
     // CRITICAL: Start V0 async and wait for it to begin processing before NSApp loads backend
     dispatch_async(window_manager_q, ^{
+      pthread_setname_np(pthread_self(), "WM_V0");
       WMRunLoop_V0();
     });
 
     // Wait for WM event loop V0 to actually start before backend initialization
     fprintf(stderr, "=== Waiting for WM event loop to start... ===\n");
+    pthread_setname_np(pthread_self(), "MAIN");
+    int wait_count = 0;
     while (!wm_v0_started) {
       usleep(10000); // Poll every 10ms
+      wait_count++;
+      if (wait_count % 100 == 0) {
+        fprintf(stderr, "[MAIN-WAIT] count=%d (%.1fs)\n", wait_count, wait_count * 0.01);
+      }
     }
-    fprintf(stderr, "=== WM event loop started! ===\n");
+    fprintf(stderr, "=== WM event loop started after %d iterations ===\n", wait_count);
 
     dispatch_async(window_manager_q, ^{
+      pthread_setname_np(pthread_self(), "WM_V1");
       WMRunLoop_V1();
     });
   }
@@ -217,6 +226,7 @@ int main(int argc, const char **argv)
   //--- Workspace (GNUstep) queue ---------------------------------------
   fprintf(stderr, "=== Workspace initialized! ===\n");
   dispatch_sync(workspace_q, ^{
+    pthread_setname_np(pthread_self(), "WS_APP");
     NSSetUncaughtExceptionHandler(WSUncaughtExceptionHandler);
     WSApplicationMain(argc, argv);
   });

@@ -37,8 +37,17 @@ if [ -z "$PORT_SOURCE_DIR" ]; then
   exit 1
 fi
 cp -Rf $PORT_SOURCE_DIR ${BUILD_ROOT}/$(basename $PORT_SOURCE_DIR)
-cd ${BUILD_ROOT}/$(basename $PORT_SOURCE_DIR)
 
+# Copy patched NSRunLoop.m with FreeBSD CPU spin fix (before cd into BUILD_ROOT)
+PATCHED_NSRUNLOOP="${CURPWD}/gnustep-base-1.29.0/Source/NSRunLoop.m"
+if [ -f "${PATCHED_NSRUNLOOP}" ]; then
+  cp -f "${PATCHED_NSRUNLOOP}" "${BUILD_ROOT}/$(basename $PORT_SOURCE_DIR)/Source/NSRunLoop.m"
+  echo ">>> Applied NSRunLoop.m CPU spin fix"
+else
+  echo "Warning: Patched NSRunLoop.m not found at ${PATCHED_NSRUNLOOP}" >&2
+fi
+
+cd ${BUILD_ROOT}/$(basename $PORT_SOURCE_DIR)
 
 export OBJCFLAGS='-fobjc-runtime=gnustep-2.0 -fblocks' \
 		ac_cv_header_bfd_h=no ac_cv_lib_bfd_bfd_openr=no
