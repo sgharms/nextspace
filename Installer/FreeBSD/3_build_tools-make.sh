@@ -44,7 +44,7 @@ cd ${BUILD_ROOT}/${GIT_PKG_NAME}
 export PKG_CONFIG_PATH="${NEXTSPACE_HOME}/lib/pkgconfig"
 export CC=clang
 export CXX=clang++
-export CFLAGS="-F${NEXTSPACE_HOME}/Frameworks"
+export CFLAGS="-F${NEXTSPACE_HOME}/Frameworks -g -O0"
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"${NEXTSPACE_HOME}/lib"
 
 cp ${CORE_SOURCES}/nextspace-freebsd.fsl ${BUILD_ROOT}/tools-make-make-${gnustep_make_version}/FilesystemLayouts/nextspace
@@ -84,7 +84,7 @@ CONFIGURE_ARGS="\
 CONFIGURE_ENV="PKG_CONFIG_PATH=${NEXTSPACE_HOME}/lib/pkgconfig \
   CC=clang \
   CXX=clang++ \
-  CFLAGS='-F${NEXTSPACE_HOME}/Frameworks -g -O0'"
+  CFLAGS='${CFLAGS}'"
 
 # Since we're building with ports, subsequent updates to this component may need a pkg-plist generated
 # since we're not using default GNUstep filesystem layout. Here's how I made this:
