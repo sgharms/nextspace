@@ -54,7 +54,12 @@ $MAKE_CMD install debug=yes messages=yes GNUSTEP_INSTALLATION_DOMAIN=SYSTEM -j12
 # Daemons, etc.
 $MKDIR_CMD "${NEXTSPACE_HOME}/etc"
 $CP_CMD ${SOURCES_DIR}/gdomap.interfaces "${NEXTSPACE_HOME}/etc"
-$CP_CMD ${SOURCES_DIR}/freebsd/gdomap /usr/local/etc/rc.d
+
+# Substitute paths in gdomap rc script before installing
+sed -e "s|/usr/local/GNUstep/System/Tools/gnustep-config|${NEXTSPACE_HOME}/bin/gnustep-config|g" \
+    -e "s|/usr/local/GNUstep/System/Library/Makefiles|/usr/local/Developer/Makefiles|g" \
+    ${SOURCES_DIR}/freebsd/gdomap > /usr/local/etc/rc.d/gdomap
+chmod 755 /usr/local/etc/rc.d/gdomap
 
 ECHO "$(tput setaf 3 bold)MANUAL INTERVENTION REQUIRED!"
 ECHO "$(tput sgr0)"
