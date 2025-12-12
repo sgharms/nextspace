@@ -41,11 +41,11 @@ fi
 #----------------------------------------
 cd ${BUILD_ROOT}/${GIT_PKG_NAME}
 #export RUNTIME_VERSION="gnustep-1.8"
-export PKG_CONFIG_PATH="/usr/NextSpace/lib/pkgconfig"
+export PKG_CONFIG_PATH="${NEXTSPACE_HOME}/lib/pkgconfig"
 export CC=clang
 export CXX=clang++
-export CFLAGS="-F/usr/NextSpace/Frameworks"
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"/usr/NextSpace/lib"
+export CFLAGS="-F${NEXTSPACE_HOME}/Frameworks"
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"${NEXTSPACE_HOME}/lib"
 
 cp ${CORE_SOURCES}/nextspace-freebsd.fsl ${BUILD_ROOT}/tools-make-make-${gnustep_make_version}/FilesystemLayouts/nextspace
 ./configure \
