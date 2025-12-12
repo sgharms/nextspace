@@ -39,7 +39,7 @@ fi
 cp -Rf $PORT_SOURCE_DIR ${BUILD_ROOT}/$(basename $PORT_SOURCE_DIR)
 cd ${BUILD_ROOT}/$(basename $PORT_SOURCE_DIR)
 
-./configure --with-default-config=/usr/local/Library/Preferences/GNUstep.conf
+./configure --with-default-config=${NEXTSPACE_HOME}/Library/Preferences/GNUstep.conf
 
 # NUCLEAR OPTION: Patch the generated config.h directly since ac_cv_func_* exports didn't work
 # These functions exist in libdispatch.so but configure fails to detect them
