@@ -37,7 +37,8 @@ ADDITIONAL_CPPFLAGS += -Wall
 ADDITIONAL_CFLAGS += 
 
 # Additional include directories the compiler should search
-ADDITIONAL_INCLUDE_DIRS += -I../Headers -I$(GNUSTEP_TARGET_DIR)
+# NextSpace headers come first to ensure e.g. using _NSSize not CGSize
+ADDITIONAL_INCLUDE_DIRS += -I/usr/local/NextSpace/include -I../Headers -I$(GNUSTEP_TARGET_DIR)
 CONFIG_SYSTEM_INCL += $(GRAPHIC_CFLAGS)
 
 # Additional LDFLAGS to pass to the linker
