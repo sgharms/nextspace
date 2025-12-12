@@ -49,7 +49,7 @@ sed -i.bak \
   -e 's|^#undef HAVE__DISPATCH_GET_MAIN_QUEUE_HANDLE_4CF$|#define HAVE__DISPATCH_GET_MAIN_QUEUE_HANDLE_4CF 1|' \
   -e 's|^#undef HAVE__DISPATCH_MAIN_QUEUE_CALLBACK_4CF$|#define HAVE__DISPATCH_MAIN_QUEUE_CALLBACK_4CF 1|' \
   Headers/GNUstepBase/config.h
-$MAKE_CMD install debug=yes messages=yes -j12
+$MAKE_CMD install debug=yes messages=yes GNUSTEP_INSTALLATION_DOMAIN=SYSTEM -j12
 
 # Daemons, etc.
 $MKDIR_CMD "${NEXTSPACE_HOME}/etc"
