@@ -257,8 +257,8 @@ void wDefaultsShouldTrackChanges(WDDomain *domain, Bool shouldTrack);
 #define DEF_WINDOW_TITLE_EXTEND_SPACE "0"
 #define DEF_MENU_TITLE_EXTEND_SPACE "0"
 #define DEF_MENU_TEXT_EXTEND_SPACE "0"
-#define DEF_ICON_BACK "(\"tpixmap\", \"/usr/local/Library/Images/common_Tile.tiff\", \"#000000\")"
-#define DEF_MINIWINDOW_BACK "(\"tpixmap\", \"/usr/local/Library/Images/common_MiniWindowTile.tiff\", \"#000000\")"
+#define DEF_ICON_BACK "(\"tpixmap\", \"common_Tile.tiff\", \"#000000\")"
+#define DEF_MINIWINDOW_BACK "(\"tpixmap\", \"common_MiniWindowTile.tiff\", \"#000000\")"
 
 #ifndef HAVE_INOTIFY
 /* Check defaults database for changes every this many milliseconds */

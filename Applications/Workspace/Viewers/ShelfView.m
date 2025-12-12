@@ -232,8 +232,11 @@
     return nil;
   }
 
+  NSLog(@"TRACE: createIconForPaths - path='%@', paths count=%lu", path, [paths count]);
+
   icon = [[PathIcon new] autorelease];
   if ([paths count] == 1) {
+    NSLog(@"TRACE: Getting icon for single file: %@", path);
     [icon setIconImage:[[NSApp delegate] iconForFile:path]];
   }
   [icon setPaths:paths];
