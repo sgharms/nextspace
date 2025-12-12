@@ -1,0 +1,56 @@
+# Makefile for CFFileDescriptor test
+#
+# This tests the minimal libdispatch + CoreFoundation stack
+# Built by scripts 0 and 1 only.
+#
+# Usage:
+#   make -f Makefile.test_cfdescriptor
+#   ./test_cfdescriptor
+
+# Installation prefix (where scripts 0 and 1 install)
+PREFIX ?= /usr/local/NextSpace
+
+# Compiler
+CC = clang
+
+# Include paths - point to framework headers
+INCLUDES = -F$(PREFIX)/Frameworks -I$(PREFIX)/include
+
+# Library paths and libraries
+LDFLAGS = -L$(PREFIX)/lib -Wl,-rpath,$(PREFIX)/lib
+LIBS = -lCoreFoundation -ldispatch -lpthread
+
+# Compiler flags
+CFLAGS = -g -O0 -Wall -DTARGET_OS_BSD=1 $(INCLUDES)
+
+# Target
+TARGET = test_cfdescriptor
+
+# Source
+SRC = test_cfdescriptor.c
+
+.PHONY: all clean run
+
+all: $(TARGET)
+
+$(TARGET): $(SRC)
+	@echo "================================================="
+	@echo "Building CFFileDescriptor test"
+	@echo "================================================="
+	@echo "Compiler: $(CC)"
+	@echo "Includes: $(INCLUDES)"
+	@echo "Libs: $(LIBS)"
+	@echo ""
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $(TARGET) $(SRC) $(LIBS)
+	@echo ""
+	@echo "✓ Build complete: ./$(TARGET)"
+	@echo ""
+
+run: $(TARGET)
+	@echo "Running test..."
+	@echo ""
+	./$(TARGET)
+
+clean:
+	rm -f $(TARGET)
+	@echo "Cleaned: $(TARGET)"

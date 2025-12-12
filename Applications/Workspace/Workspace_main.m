@@ -35,6 +35,7 @@
 
 // Global - set in WM/event.c - WMRunLoop()
 CFRunLoopRef wm_runloop = NULL;
+volatile int wm_v0_started = 0;
 
 //-----------------------------------------------------------------------------
 // Workspace X Window related utility functions
@@ -196,9 +197,18 @@ int main(int argc, const char **argv)
     [defs release];
 
     // Start WM run loop V0 to catch events while V1 is warming up.
+    // CRITICAL: Start V0 async and wait for it to begin processing before NSApp loads backend
     dispatch_async(window_manager_q, ^{
       WMRunLoop_V0();
     });
+
+    // Wait for WM event loop V0 to actually start before backend initialization
+    fprintf(stderr, "=== Waiting for WM event loop to start... ===\n");
+    while (!wm_v0_started) {
+      usleep(10000); // Poll every 10ms
+    }
+    fprintf(stderr, "=== WM event loop started! ===\n");
+
     dispatch_async(window_manager_q, ^{
       WMRunLoop_V1();
     });
