@@ -15,50 +15,40 @@ NEXTSPACE_HOME="/usr/local/NextSpace"
 #----------------------------------------
 ECHO ">>> Installing packages for GNUstep GUI (AppKit) build"
 . /usr/local/Developer/Makefiles/GNUstep.sh
-GNUSTEP_GUI_PORT_DIR="/usr/ports/x11-toolkits/gnustep-gui"
-[ -d $GNUSTEP_GUI_PORT_DIR ] || echo $(cat << EOF 1>&2
-FreeBSD installation relies on the ports(7) infrastructure.
-
-Please make sure you have cloned https://git.FreeBSD.org/ports.git
-EOF
-)
-[ "$PORTS_MAKE_ARGS" ] || PORTS_MAKE_ARGS="GNUSTEP_PREFIX=/usr/local/Developer DEFAULT_VERSIONS+=ssl=openssl"
 $PRIV_CMD pkg install -y ${GNUSTEP_GUI_DEPS}
 
+#----------------------------------------
+# Download from upstream GNUstep (not ports)
+#----------------------------------------
+GIT_PKG_NAME=libs-gui-gui-${gnustep_gui_version}
 SOURCES_DIR=${PROJECT_DIR}/Libraries/gnustep
-cd $GNUSTEP_GUI_PORT_DIR # We should already be there but...
-$BSDMAKE_CMD $PORTS_MAKE_ARGS patch
-PORT_SOURCE_DIR=$(find . -name libs-gui\* -type d)
-if [ -z "$PORT_SOURCE_DIR" ]; then
-  echo "Oh no! Couldn't find a directory, was ${PORT_SOURCE_DIR}" >&2
-  exit 1
+
+if [ ! -d ${BUILD_ROOT}/${GIT_PKG_NAME} ]; then
+	ECHO ">>> Downloading GNUstep GUI ${gnustep_gui_version} from GitHub"
+	fetch -o ${BUILD_ROOT}/${GIT_PKG_NAME}.tar.gz https://github.com/gnustep/libs-gui/archive/gui-${gnustep_gui_version}.tar.gz || exit 1
+	cd ${BUILD_ROOT}
+	tar zxf ${GIT_PKG_NAME}.tar.gz || exit 1
+
+	# Patches
+	cd ${BUILD_ROOT}/${GIT_PKG_NAME}
+	ECHO ">>> Applying patches"
+	patch -p1 --forward --batch < ${SOURCES_DIR}/libs-gui_NSApplication.patch
+	# Disabled upstream
+	#	patch -p1 < ${SOURCES_DIR}/libs-gui_GSThemeDrawing.patch
+	patch -p1 --forward --batch < ${SOURCES_DIR}/libs-gui_NSPopUpButton.patch
+
+	cd Images
+	tar zxf ${SOURCES_DIR}/gnustep-gui-images.tar.gz
 fi
 
-cp -Rf $PORT_SOURCE_DIR ${BUILD_ROOT}/$(basename $PORT_SOURCE_DIR)
-cd ${BUILD_ROOT}/$(basename $PORT_SOURCE_DIR)
+#----------------------------------------
+# Build
+#----------------------------------------
+cd ${BUILD_ROOT}/${GIT_PKG_NAME} || exit 1
+ECHO ">>> Configuring GNUstep GUI"
+./configure --with-default-config=${NEXTSPACE_HOME}/Library/Preferences/GNUstep.conf || exit 1
 
-# Patches
-echo "Patching ${SOURCES_DIR}/libs-gui_NSApplication.patch"
-patch -p1 --forward --batch < ${SOURCES_DIR}/libs-gui_NSApplication.patch
+ECHO ">>> Building and installing GNUstep GUI"
+$MAKE_CMD install debug=yes messages=yes GNUSTEP_INSTALLATION_DOMAIN=SYSTEM -j${CPU_COUNT} || { echo "Install of gnustep-gui failed"; exit 1; }
 
-# Disabled upstream
-#	patch -p1 < ${SOURCES_DIR}/libs-gui_GSThemeDrawing.patch
-
-echo "${SOURCES_DIR}/libs-gui_NSPopUpButton.patch"
-patch -p1 --forward --batch < ${SOURCES_DIR}/libs-gui_NSPopUpButton.patch
-
-echo "${PROJECT_DIR}/Installer/FreeBSD/patches/freebsd"
-
-# This patch doesn't have a leading dir on it, so it's different than the
-# previous two
-patch -p0 --forward --batch < ${PROJECT_DIR}/Installer/FreeBSD/patches/freebsd
-
-cd Images
-tar zxf ${SOURCES_DIR}/gnustep-gui-images.tar.gz
-
-cd ${BUILD_ROOT}/$(basename $PORT_SOURCE_DIR)
-./configure --with-default-config=${NEXTSPACE_HOME}/Library/Preferences/GNUstep.conf
-
-$MAKE_CMD install debug=yes messages=yes GNUSTEP_INSTALLATION_DOMAIN=SYSTEM -j${CPU_COUNT} || { echo "Install of gnustep-gui port failed"; exit 1; }
-
-echo "Installed $(basename $PORT_SOURCE_DIR)"
+echo "Installed ${GIT_PKG_NAME}"
