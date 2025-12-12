@@ -1,4 +1,5 @@
 # -*- mode: makefile-gmake -*-
 
+ADDITIONAL_OBJCFLAGS += -g2 -O0
 ADDITIONAL_INCLUDE_DIRS += -I../..
 ADDITIONAL_GUI_LIBS += -lDesktopKit

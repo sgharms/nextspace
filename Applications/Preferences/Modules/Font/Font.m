@@ -159,9 +159,11 @@ static NSPanel *fontPanel = nil;
   } else {
     wmDefaults = [[NSMutableDictionary alloc] initWithContentsOfFile:wmDefaultsPath];
   }
+  NSDebugLLog(@"Font", @"Will persist to %@", wmDefaultsPath);
 
   [wmDefaults setObject:value forKey:key];
   [wmDefaults writeToFile:wmDefaultsPath atomically:YES];
+  NSDebugLLog(@"Font", @"Finished write of WindowMaker Preferences");
   [wmDefaults release];
 }
 
@@ -335,8 +337,13 @@ static NSPanel *fontPanel = nil;
                          size:[self _getFloatDefault:fontSizeKey]];
 
   fontManager = [NSFontManager sharedFontManager];
+#ifdef __FreeBSD__
+  NSDebugLLog(@"BSD", @"Enabled Custom FreeBSD delegate setting");
+  [fontManager setDelegate: self];
+#endif
   [fontManager setSelectedFont:font isMultiple:NO];
   if (!fontPanel) {
+    NSDebugLLog(@"Font", @"[updateFontPanel]: fontPanel not memoized: creating anew");
     fontPanel = [fontManager fontPanel:YES];
     [fontPanel setDelegate:self];
   }
@@ -395,20 +402,26 @@ static NSPanel *fontPanel = nil;
   NSFontManager *fontManager = [NSFontManager sharedFontManager];
   NSFont *font;
 
+  NSDebugLLog(@"Font", @"[changeFont]: Began");
   font = [fontManager convertFont:[fontExampleTextView font]];
   fontName = [font fontName];
   fontSize = [font pointSize];
   fontKey = [fontCategories objectForKey:[fontCategoryPopUp titleOfSelectedItem]];
 
+  NSDebugLLog(@"Font", @"Font %@ with fontKey %@", fontName, fontKey);
+
   if ([fontKey isEqualToString:@"NSUserFont"]) {  // Application
+    NSDebugLLog(@"Font", @"Processing NSUserFont");
     // NSUserFont, NSUserFontSize=12
     [self _setStringDefault:fontName forName:@"NSUserFont"];
     [self _setFloatDefault:fontSize  forName:@"NSUserFontSize"];
   } else if ([fontKey isEqualToString:@"NSUserFixedPitchFont"]) {  // Fixed Pitch
+    NSDebugLLog(@"Font", @"Processing NSUserFixedPitchFont");
     // NSUserFixedPitchFont, NSUserFixedPitchFontSize
     [self _setStringDefault:fontName forName:@"NSUserFixedPitchFont"];
     [self _setFloatDefault:fontSize forName:@"NSUserFixedPitchFontSize"];
   } else if ([fontKey isEqualToString:@"NSFont"]) {  // System
+    NSDebugLLog(@"Font", @"Processing NSFont");
     // NSFont, NSFontSize=12
     [self _setStringDefault:fontName forName:@"NSFont"];
     [self _setFloatDefault:fontSize forName:@"NSFontSize"];
@@ -428,6 +441,7 @@ static NSPanel *fontPanel = nil;
     [self _setFloatDefault:fontSize - 3.0 forName:@"NSMiniFontSize"];
     [self _setFloatDefault:fontSize - 2.0 forName:@"NSSmallFontSize"];
     // WM
+    NSDebugLLog(@"Font", @"Calculating WindowMaker settings");
     [self _setWMFont:font forKey:@"MenuTextFont"];
     [self _setWMFont:[NSFont fontWithName:fontName size:fontSize - 3.0] forKey:@"IconTitleFont"];
     [self _setWMFont:[NSFont fontWithName:fontName size:fontSize * 2.0] forKey:@"LargeDisplayFont"];
@@ -435,6 +449,7 @@ static NSPanel *fontPanel = nil;
         postNotificationName:WMDidChangeAppearanceSettingsNotification
                       object:@"GSWorkspaceNotification"];
   } else if ([fontKey isEqualToString:@"NSBoldFont"]) {  // Bold System
+    NSDebugLLog(@"Font", @"Processing NSBoldFont");
     // NSBoldFont, NSBoldFontSize=12
     [self _setStringDefault:fontName forName:@"NSBoldFont"];
     [self _setFloatDefault:fontSize forName:@"NSBoldFontSize"];
@@ -453,16 +468,21 @@ static NSPanel *fontPanel = nil;
         postNotificationName:WMDidChangeAppearanceSettingsNotification
                       object:@"GSWorkspaceNotification"];
   } else if ([fontKey isEqualToString:@"NSToolTipsFont"]) {  // Tool Tips
+    NSDebugLLog(@"Font", @"Processing NSToolTipsFont");
     // NSToolTipsFont, NSToolTipsFontSize=11
     [self _setStringDefault:fontName forName:@"NSToolTipsFont"];
     [self _setFloatDefault:fontSize forName:@"NSToolTipsFontSize"];
   }
 
+  NSDebugLLog(@"Font", @"Synchronizing defaults");
   [defaults synchronize];
+  NSDebugLLog(@"Font", @"Updating the UI");
   [self updateUI];
+  NSDebugLLog(@"Font", @"Posting NXTSystemFontPreferencesDidChangeNotification");
   [[NSDistributedNotificationCenter defaultCenter]
       postNotificationName:@"NXTSystemFontPreferencesDidChangeNotification"
                     object:@"Preferences"];
+  NSDebugLLog(@"Font", @"[changeFont]: Ended");
 }
 
 @end  // Font

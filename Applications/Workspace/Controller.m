@@ -431,12 +431,6 @@ static NSString *WMComputerShouldGoDownNotification = @"WMComputerShouldGoDownNo
   // [systemPower stopEventsMonitor];
   // [systemPower release];
 
-  // System Beep
-  if (bellSound) {
-    [bellSound stop];
-    [bellSound release];
-  }
-
   // Controller (NSWorkspace) objects
   TEST_RELEASE(_wrappers);
   TEST_RELEASE(_iconMap);
@@ -579,6 +573,8 @@ static NSString *WMComputerShouldGoDownNotification = @"WMComputerShouldGoDownNo
   BOOL isDir;
   FileViewer *fv;
 
+  NSLog(@"TRACE: newViewerRootedAt called with path='%@' viewer='%@' isRoot=%d", path, viewerType, root);
+
   if ([fm fileExistsAtPath:path isDirectory:&isDir] && isDir) {
     fv = [[FileViewer alloc] initRootedAtPath:path viewer:viewerType isRoot:root];
     [fileViewers addObject:fv];
@@ -694,16 +690,22 @@ static NSString *WMComputerShouldGoDownNotification = @"WMComputerShouldGoDownNo
 
   // Fill menu 'View' with file viewers
   [self _loadViewMenu:[viewMenuItem submenu]];
+  NSLog(@"DEBUG: viewMenuItem=%@, submenu=%@", viewMenuItem, [viewMenuItem submenu]);
+  NSLog(@"DEBUG: mainMenu=%@, itemArray count=%lu", [NSApp mainMenu], (unsigned long)[[[NSApp mainMenu] itemArray] count]);
 
   // File Viewers and Console
   fileViewers = [[NSMutableArray alloc] init];
 
   // Now we are ready to show windows and menu
   WAppIcon *appicon = wDockAppiconAtSlot(wDefaultScreen()->dock, 0);
+  NSLog(@"DEBUG: appicon=%p, auto_launch=%d", appicon, appicon ? appicon->flags.auto_launch : -1);
   if (appicon && appicon->flags.auto_launch == 1) {
+    NSLog(@"DEBUG: Taking auto_launch path, calling mainMenu display");
     [self _restoreWindows];
     [[NSApp mainMenu] display];
+    NSLog(@"DEBUG: mainMenu display called, menu=%@", [NSApp mainMenu]);
   } else {
+    NSLog(@"DEBUG: Taking delayed activation path, waiting for NSApplicationWillBecomeActiveNotification");
     [nc addObserver:self
            selector:@selector(activateApplication:)
                name:NSApplicationWillBecomeActiveNotification
@@ -753,11 +755,14 @@ static NSString *WMComputerShouldGoDownNotification = @"WMComputerShouldGoDownNo
 
 - (void)activateApplication:(NSNotification *)aNotification
 {
+  NSLog(@"DEBUG: activateApplication called, notification=%@", aNotification);
   [[NSNotificationCenter defaultCenter] removeObserver:self
                                                   name:NSApplicationWillBecomeActiveNotification
                                                 object:NSApp];
   [self _restoreWindows];
+  NSLog(@"DEBUG: About to display mainMenu, menu=%@", [NSApp mainMenu]);
   [[NSApp mainMenu] display];
+  NSLog(@"DEBUG: mainMenu display completed");
 }
 
 // Log Out -
@@ -1481,18 +1486,7 @@ static NSString *WMComputerShouldGoDownNotification = @"WMComputerShouldGoDownNo
 // static NSTimer  *soundTimer = nil;
 - (void)ringBell
 {
-  if (bellSound == nil) {
-    OSEDefaults *defs = [OSEDefaults globalUserDefaults];
-    NSString *bellPath = [defs objectForKey:@"NXSystemBeep"];
-    if (bellPath == nil || [[NSFileManager defaultManager] fileExistsAtPath:bellPath] == NO) {
-      bellPath = @"/usr/NextSpace/Sounds/Bonk.snd";
-    }
-    bellSound = [[NXTSound alloc] initWithContentsOfFile:bellPath
-                                             byReference:YES
-                                              streamType:SNDEventType];
-  }
-
-  [bellSound play];
+  return;
 }
 
 @end

@@ -15,7 +15,7 @@
 ADDITIONAL_CPPFLAGS += 
 
 # Additional flags to pass to the Objective-C compiler
-ADDITIONAL_OBJCFLAGS += -Wno-unused-parameter
+ADDITIONAL_OBJCFLAGS += -Wno-unused-parameter -g2 -O0 -DSGHARMS_ENABLE_ENV_VAR_FONT_SPECIFICATION
 
 # Additional flags to pass to the C compiler
 ADDITIONAL_CFLAGS += -g

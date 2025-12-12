@@ -4,7 +4,7 @@
 ADDITIONAL_CPPFLAGS += 
 
 # Additional flags to pass to Objective C compiler
-ADDITIONAL_OBJCFLAGS += 
+ADDITIONAL_OBJCFLAGS += -g2 -O0
 
 # Additional flags to pass to C compiler
 ADDITIONAL_CFLAGS += 
@@ -18,3 +18,7 @@ ADDITIONAL_INCLUDE_DIRS +=
 # Additional library directories the linker should search
 ADDITIONAL_LIB_DIRS += 
 
+ifeq ($(findstring freebsd,$(GNUSTEP_TARGET_OS)),freebsd)
+  ADDITIONAL_CPPFLAGS += -I/usr/local/NextSpace/include
+  ADDITIONAL_LDFLAGS  += -L/usr/local/NextSpace/lib -ldispatch
+endif

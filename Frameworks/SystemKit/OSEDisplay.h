@@ -50,12 +50,11 @@ typedef struct _NXGammaValue NXGammaValue;
   NXGammaValue gammaValue;
   CGFloat gammaBrightness;
 
-  NSMutableDictionary *properties;
-
   BOOL isMain;
   // BOOL			isActive;
 }
 
+@property (readonly, retain) NSMutableDictionary *displayProperties;
 @property (readonly) NSString *outputName;  // LVDS, VGA, DVI, HDMI
 @property (readonly) NSSize physicalSize;   // in milimetres
 @property (readonly) BOOL isBuiltin;        // determined by outputName
@@ -143,7 +142,6 @@ typedef struct _NXGammaValue NXGammaValue;
 //--- Display properties
 //------------------------------------------------------------------------------
 - (void)parseProperties;
-- (NSDictionary *)properties;
 - (id)uniqueID;
 
 // - (NSString *)model;    // EDID

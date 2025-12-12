@@ -1,8 +1,21 @@
 ###############################################################################
 # Variables
 ###############################################################################
-ECHO="/usr/bin/echo -e"
+ECHO () {
+  printf "%b\n" "$*"
+}
 _PWD=`pwd`
+
+if [ "$(id -u)" = 0 ]; then
+  PRIV_CMD=""
+elif command -v doas >/dev/null 2>&1; then
+  PRIV_CMD="doas"
+elif command -v sudo >/dev/null 2>&1; then
+  PRIV_CMD="sudo"
+else
+  ECHO "Error: Neither doas nor sudo found" >&2
+  exit 1
+fi
 
 #----------------------------------------
 # Libraries and applications
@@ -24,7 +37,7 @@ projectcenter_version=0_7_0
 #----------------------------------------
 . /etc/os-release
 # OS type like "rhel"
-OS_LIKE=`echo ${ID_LIKE} | awk '{print $1}'`
+OS_LIKE=`ECHO ${ID_LIKE} | awk '{print $1}'`
 # OS name like "fedora"
 OS_ID=$ID
 _ID=`echo ${ID} | awk -F\" '{print $2}'`
@@ -39,7 +52,7 @@ if [ -n "${_VER}" ] && [ "${_VER}" != " " ]; then
 fi
 # Name like "Fedora Linux"
 OS_NAME=$NAME
-${ECHO} "OS:\t\t${OS_ID}-${OS_VERSION}"
+ECHO "OS:\t\t${OS_ID}-${OS_VERSION}"
 
 #---------------------------------------
 # Machine
@@ -47,12 +60,16 @@ ${ECHO} "OS:\t\t${OS_ID}-${OS_VERSION}"
 MACHINE=`uname -m`
 if [ -f /proc/device-tree/model ];then
 	MODEL=`cat /proc/device-tree/model | awk '{print $1}'`
+elif [ -n `command -v sysctl >/dev/null 2>&1` ]; then
+  MODEL=`sysctl -n hw.model 2>/dev/null`
 else
-	MODEL="unkown"
+	MODEL="unknown"
 fi
 
 if [ -f /proc/device-tree/compatible ];then
 	GPU=`tr -d '\0' < /proc/device-tree/compatible | awk -F, '{print $3}'`
+elif [ -n `command -v pciconf >/dev/null 2>&1` ]; then
+  GPU=`pciconf -lv | grep -B2 display | grep device | cut -d"'" -f2 2>/dev/null`
 else
 	GPU="unknown"
 fi
@@ -63,19 +80,19 @@ fi
 # Directory where nextspace GitHub repo resides
 cd ../..
 PROJECT_DIR=`pwd`
-${ECHO} "NextSpace repo:\t${PROJECT_DIR}"
+ECHO "NextSpace repo:\t${PROJECT_DIR}"
 cd ${_PWD}
 
 if [ -z $BUILD_RPM ]; then
-  BUILD_ROOT="${_PWD}/BUILD_ROOT"
+  BUILD_ROOT="${BUILD_ROOT:=${_PWD}/BUILD_ROOT}"
   if [ ! -d ${BUILD_ROOT} ]; then
     mkdir ${BUILD_ROOT}
   fi
-  ${ECHO} "Build in:\t${BUILD_ROOT}"
+  ECHO "Build in:\t${BUILD_ROOT}"
 
   if [ "$1" != "" ];then
     DEST_DIR=${1}
-    ${ECHO} "Install in:\t${1}"
+    ECHO "Install in:\t${1}"
   else
     DEST_DIR=""
   fi
@@ -92,14 +109,14 @@ else
   mkdir -p $RPM_SOURCES_DIR
   mkdir -p $RPM_SPECS_DIR
 
-  ${ECHO} "RPMs directory:\t$RPMS_DIR"
+  ECHO "RPMs directory:\t$RPMS_DIR"
 fi
 
 . ../functions.sh
 #----------------------------------------
 # Package dependencies
 #----------------------------------------
-if [ ${OS_ID} = "debian" ] || [ ${OS_ID} = "ubuntu" ]; then
+if [ ${OS_ID} = "debian" ] || [ ${OS_ID} = "ubuntu" ] || [ ${OS_ID} = "freebsd" ]; then
     . ./${OS_ID}-${OS_VERSION}.deps.sh || exit 1
 else
     prepare_redhat_environment
@@ -115,11 +132,23 @@ if type "gmake" 2>/dev/null >/dev/null ;then
 else
   MAKE_CMD=make
 fi
+
+if [ ${OS_ID} = "freebsd" ]; then
+  BSDMAKE_CMD=make
+  CPU_COUNT=$(sysctl -n hw.ncpu 2>/dev/null || echo 1)
+fi
+
 #
 if [ "$1" != "" ];then
   INSTALL_CMD="${MAKE_CMD} install DESTDIR=${1}"
 else
-  INSTALL_CMD="sudo -E ${MAKE_CMD} install"
+  if [ "$(id -u)" = 0 ]; then
+    INSTALL_CMD="${MAKE_CMD} install"
+  elif [ "${PRIV_CMD}" = "sudo" ]; then
+    INSTALL_CMD="${PRIV_CMD} -E ${MAKE_CMD} install"
+  else
+    INSTALL_CMD="${PRIV_CMD} ${MAKE_CMD} install"
+  fi
 fi
 
 # Utilities
@@ -130,32 +159,39 @@ if [ "$1" != "" ];then
   CP_CMD="cp -R"
   MKDIR_CMD="mkdir -p"
 else
-  RM_CMD="sudo rm"
-  LN_CMD="sudo ln -sf"
-  MV_CMD="sudo mv -v"
-  CP_CMD="sudo cp -R"
-  MKDIR_CMD="sudo mkdir -p"
+  RM_CMD="$PRIV_CMD rm"
+  LN_CMD="$PRIV_CMD ln -sf"
+  MV_CMD="$PRIV_CMD mv -v"
+  CP_CMD="$PRIV_CMD cp -R"
+  MKDIR_CMD="$PRIV_CMD mkdir -p"
 fi
 
 # Linker
-ld -v | grep "gold" 2>&1 > /dev/null
-if [ "$?" = "1" ]; then
-  ${ECHO} "Setting up Gold linker..."
-  sudo update-alternatives --install /usr/bin/ld ld /usr/bin/ld.gold 100
-  sudo update-alternatives --install /usr/bin/ld ld /usr/bin/ld.bfd 10
-  sudo update-alternatives --auto ld
+
+# FreeBSD's default ld.lld is "a drop-in replacement for the GNU BFD and gold
+# linkers." per ld.lld(1)
+if [ "${OS_ID}" != "freebsd" ]; then
   ld -v | grep "gold" 2>&1 > /dev/null
   if [ "$?" = "1" ]; then
-    ${ECHO} "Failed to setup Gold linker"
-    exit 1
+    ECHO "Setting up Gold linker..."
+    $PRIV_CMD update-alternatives --install /usr/bin/ld ld /usr/bin/ld.gold 100
+    $PRIV_CMD update-alternatives --install /usr/bin/ld ld /usr/bin/ld.bfd 10
+    $PRIV_CMD update-alternatives --auto ld
+    ld -v | grep "gold" 2>&1 > /dev/null
+    if [ "$?" = "1" ]; then
+      ECHO "Failed to setup Gold linker"
+      exit 1
+    fi
+  else
+    ECHO "Using linker:\tGold"
   fi
-else
-  ${ECHO} "Using linker:\tGold"
 fi
 # Compiler
-if [ "$OS_ID" = "fedora" ] || [ "$OS_LIKE" = "rhel" ] || [ "$OS_ID" = "debian" ] || [ "$OS_ID" = "ubuntu" ] || [ "$OS_ID" = "ultramarine" ]; then
+if [ "$OS_ID" = "fedora" ] || [ "$OS_LIKE" = "rhel" ] || [ "$OS_ID" = "debian" ] || [ "$OS_ID" = "ubuntu" ] || [ "$OS_ID" = "ultramarine" ] || [ "$OS_ID" = "freebsd" ]; then
   which clang 2>&1 > /dev/null || { echo "No clang compiler found. Please install clang package."; exit 1; }
   C_COMPILER=`which clang`
   which clang++ 2>&1 > /dev/null || { echo "No clang++ compiler found. Please install clang++ package."; exit 1; }
   CXX_COMPILER=`which clang++`
 fi
+
+GNUSTEP_CONFIG_CMD=$(find /usr -name gnustep-config | grep Tools | head -1)

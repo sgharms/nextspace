@@ -20,12 +20,22 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
+#ifndef __FreeBSD__
 #include <termio.h>
+#else
+#include <termios.h>
+#endif
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <fcntl.h>
+#ifndef __FreeBSD__
 #include <pty.h>
+#else
+#include <sys/types.h>
+#include <sys/ioctl.h>
+#include <libutil.h>
+#endif
 #include <sys/wait.h>
 
 #import <AppKit/AppKit.h>

@@ -298,11 +298,27 @@ static void load_font_configuration(void)
   families_pending = [[NSMutableSet alloc] init];
 
   paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSAllDomainsMask, YES);
+
+  // FreeBSD/NextSpace: NSSearchPathForDirectoriesInDomains doesn't return NextSpace paths.
+  // Explicitly add NextSpace font directories to ensure fonts are found.
+  // The loop below will append "/Fonts" to each path.
+  NSMutableArray *fontPaths = [NSMutableArray arrayWithArray:paths];
+  [fontPaths addObject:@"/usr/local/NextSpace/Library"];
+  [fontPaths addObject:@"/usr/local/NextSpace/Frameworks/DesktopKit.framework/Resources"];
+  paths = fontPaths;
+
+  NSLog(@"[FTFontEnumerator] Searching for fonts in %lu paths:", (unsigned long)[paths count]);
+  for (i = 0; i < [paths count]; i++) {
+    NSLog(@"[FTFontEnumerator]   Path %d: %@/Fonts", i, [paths objectAtIndex:i]);
+  }
+
   for (i = 0; i < [paths count]; i++) {
     path = [paths objectAtIndex:i];
     path = [path stringByAppendingPathComponent:@"Fonts"];
     files = [fm directoryContentsAtPath:path];
     c = [files count];
+
+    NSLog(@"[FTFontEnumerator] Checking %@: found %lu items", path, (unsigned long)c);
 
     for (j = 0; j < c; j++) {
       NSString *family;
@@ -326,14 +342,21 @@ static void load_font_configuration(void)
 
       font_path = [path stringByAppendingPathComponent:font_path];
 
+      NSLog(@"[FTFontEnumerator] Loading .nfont package: %@", font_path);
       NSDebugLLog(@"ftfont", @"loading %@", font_path);
 
       font_info_path = [font_path stringByAppendingPathComponent:@"FontInfo.plist"];
-      if (![fm fileExistsAtPath:font_info_path])
+      if (![fm fileExistsAtPath:font_info_path]) {
+        NSLog(@"[FTFontEnumerator] ERROR: FontInfo.plist not found at: %@", font_info_path);
         continue;
+      }
       d = [NSDictionary dictionaryWithContentsOfFile:font_info_path];
-      if (!d)
+      if (!d) {
+        NSLog(@"[FTFontEnumerator] ERROR: Could not load FontInfo.plist from: %@", font_info_path);
         continue;
+      }
+
+      NSLog(@"[FTFontEnumerator] Successfully loaded FontInfo.plist from: %@", font_info_path);
 
       if ([d objectForKey:@"Family"])
         family = [d objectForKey:@"Family"];
@@ -356,8 +379,11 @@ static void load_font_configuration(void)
         continue;
       }
 
+      NSLog(@"[FTFontEnumerator] Processing %lu faces for family '%@'", (unsigned long)[faces count], family);
+
       for (k = 0; k < [faces count]; k++) {
         face_info = [faces objectAtIndex:k];
+        NSLog(@"[FTFontEnumerator]   Face %d: %@", k, [face_info objectForKey:@"PostScriptName"]);
         add_face(family, weight, traits, face_info, font_path, YES);
       }
     }
@@ -382,11 +408,79 @@ static void load_font_configuration(void)
     [families_pending removeAllObjects];
   }
 
+  // FreeBSD/NextSpace: Create family-level aliases for default faces.
+  // Fonts are registered by their PostScript names (e.g. "Helvetica-Medium", "Helvetica-Bold")
+  // but lookups often use just the family name (e.g. "Helvetica").
+  // Create aliases mapping family names to their default/regular face.
+  // Prefer non-italic faces with weight closest to 5 (normal/medium weight).
+  NSLog(@"[FTFontEnumerator] Creating family-level font aliases...");
+  NSEnumerator *familyEnum = [fcfg_allFontFamilies keyEnumerator];
+  NSString *familyName;
+  while ((familyName = [familyEnum nextObject])) {
+    NSArray *facesArray = [fcfg_allFontFamilies objectForKey:familyName];
+    if ([facesArray count] == 0)
+      continue;
+
+    // Find the default face (weight=5 is normal/medium, weight=7 is bold)
+    // Prefer Medium/Regular (weight=5), non-italic, fall back to first face
+    NSString *defaultFontName = nil;
+    int bestWeight = 999;
+    unsigned int bestTraits = 999;
+
+    NSLog(@"[FTFontEnumerator]   Family '%@' has %lu faces:", familyName, (unsigned long)[facesArray count]);
+    for (int i = 0; i < [facesArray count]; i++) {
+      NSArray *faceInfo = [facesArray objectAtIndex:i];
+      NSString *psName = [faceInfo objectAtIndex:0];      // PostScript name
+      NSString *faceName = [faceInfo objectAtIndex:1];    // face name
+      NSNumber *weightNum = [faceInfo objectAtIndex:2];   // weight
+      NSNumber *traitsNum = [faceInfo objectAtIndex:3];   // traits
+      int weight = [weightNum intValue];
+      unsigned int traits = [traitsNum unsignedIntValue];
+
+      NSLog(@"[FTFontEnumerator]     Face '%@': weight=%d, traits=%u", psName, weight, traits);
+
+      // Prefer weight=5 (Medium/Regular) with traits=0 (upright, not italic/oblique)
+      // Prioritize: 1) non-italic (traits&1==0), 2) weight closest to 5
+      BOOL isItalic = (traits & 1) != 0;
+      BOOL currentIsItalic = (bestTraits & 1) != 0;
+
+      if (defaultFontName == nil) {
+        // First face, take it
+        defaultFontName = psName;
+        bestWeight = weight;
+        bestTraits = traits;
+      } else if (!isItalic && currentIsItalic) {
+        // Prefer non-italic over italic
+        defaultFontName = psName;
+        bestWeight = weight;
+        bestTraits = traits;
+      } else if (isItalic == currentIsItalic && abs(weight - 5) < abs(bestWeight - 5)) {
+        // Same italic status, prefer better weight
+        defaultFontName = psName;
+        bestWeight = weight;
+        bestTraits = traits;
+      }
+    }
+
+    if (defaultFontName) {
+      FTFaceInfo *defaultFace = [fcfg_all_fonts objectForKey:defaultFontName];
+      if (defaultFace) {
+        // Register family name as alias to default face
+        [fcfg_all_fonts setObject:defaultFace forKey:familyName];
+        NSLog(@"[FTFontEnumerator]   Alias: '%@' -> '%@'", familyName, defaultFontName);
+      }
+    }
+  }
+
+  NSLog(@"[FTFontEnumerator] SUMMARY: Loaded %lu fonts in %lu families",
+        (unsigned long)[fcfg_allFontNames count], (unsigned long)[fcfg_allFontFamilies count]);
+  NSLog(@"[FTFontEnumerator] Available font families: %@",
+        [[fcfg_allFontFamilies allKeys] sortedArrayUsingSelector:@selector(compare:)]);
   NSDebugLLog(@"ftfont", @"got %lu fonts in %lu families", [fcfg_allFontNames count],
               [fcfg_allFontFamilies count]);
 
   if (![fcfg_allFontNames count]) {
-    NSLog(@"No fonts found!");
+    NSLog(@"[FTFontEnumerator] FATAL: No fonts found!");
     exit(1);
   }
 
@@ -403,8 +497,13 @@ static void load_font_configuration(void)
   face = [fcfg_all_fonts objectForKey:name];
   if (!face) {
     // Try "Family-Typeface" pattern instead of "Typeface Pattern"
-    name = [name stringByReplacingOccurrencesOfString:@" " withString:@"-"];
-    face = [fcfg_all_fonts objectForKey:name];
+    NSString *altName = [name stringByReplacingOccurrencesOfString:@" " withString:@"-"];
+    face = [fcfg_all_fonts objectForKey:altName];
+    if (!face) {
+      NSLog(@"[FTFontEnumerator] Font not found: '%@' (also tried '%@')", name, altName);
+      NSLog(@"[FTFontEnumerator] Available fonts: %@",
+            [[fcfg_all_fonts allKeys] sortedArrayUsingSelector:@selector(compare:)]);
+    }
   }
   if (!face) {
     NSLog(@"Font not found %@", name);

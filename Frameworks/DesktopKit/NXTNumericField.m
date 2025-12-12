@@ -19,7 +19,14 @@
 // Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111 USA.
 //
 
+#ifdef __FreeBSD__
+#include <limits.h>
+#include <float.h>
+#define MAXINT INT_MAX
+#define MININT INT_MIN
+#else
 #include <values.h>
+#endif
 #import "NXTNumericField.h"
 
 @implementation NXTNumericField (Private)

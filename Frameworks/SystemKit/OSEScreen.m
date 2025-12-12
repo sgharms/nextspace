@@ -945,7 +945,7 @@ static OSEScreen *systemScreen = nil;
               forKey:OSEDisplayGammaBrightnessKey];
     [d setObject:gamma forKey:OSEDisplayGammaKey];
       
-    if ((properties = [display properties])) {
+    if ((properties = [display displayProperties])) {
       [d setObject:properties forKey:OSEDisplayPropertiesKey];
     }
       
@@ -996,7 +996,7 @@ static OSEScreen *systemScreen = nil;
 
       gamma = [display gammaDescription];
       [d setObject:gamma forKey:OSEDisplayGammaKey];
-      if ((properties = [display properties])) {
+      if ((properties = [display displayProperties])) {
         [d setObject:properties forKey:OSEDisplayPropertiesKey];
       }
     }

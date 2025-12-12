@@ -25,6 +25,8 @@
 #import <SystemKit/OSEScreen.h>
 #import <SystemKit/OSEDefaults.h>
 
+#include <unistd.h>
+
 #import "Application.h"
 #import "Recycler.h"
 #import "Workspace+WM.h"
@@ -33,6 +35,7 @@
 
 // Global - set in WM/event.c - WMRunLoop()
 CFRunLoopRef wm_runloop = NULL;
+volatile int wm_v0_started = 0;
 
 //-----------------------------------------------------------------------------
 // Workspace X Window related utility functions
@@ -132,6 +135,12 @@ int main(int argc, const char **argv)
     exit(1);
   }
 
+ /*
+  * Resolves race condition when testing for display twice in too narrow of a
+  * time window.
+  */
+	usleep(100000);
+
   if (_isWindowManagerRunning() == YES) {
     fprintf(stderr, "[Workspace] Error: other window manager already running. Quitting...\n");
     exit(1);
@@ -140,11 +149,15 @@ int main(int argc, const char **argv)
   fprintf(stderr, "=== Starting Workspace ===\n");
   workspace_q = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0);
   dispatch_sync(workspace_q, ^{
+#ifndef __FreeBSD__
     @autoreleasepool {
+#endif
       // Restore display layout
       OSEScreen *screen = [OSEScreen sharedScreen];
       [screen applySavedDisplayLayout];
+#ifndef __FreeBSD__
     }
+#endif
   });
   {
     // DISPATCH_QUEUE_CONCURRENT is mandatory for CFRunLoop run.
@@ -154,6 +167,10 @@ int main(int argc, const char **argv)
     //--- Initialize Window Manager
     fprintf(stderr, "=== Initializing Window Manager ===\n");
     dispatch_sync(window_manager_q, ^{
+        /* Context: This initializes an inert desktop with X primitive logic:
+         *
+         * The event loops enable event handling.
+         */
       wInitialize(argc, (char **)argv);
       wStartUp(True);
 
@@ -180,9 +197,18 @@ int main(int argc, const char **argv)
     [defs release];
 
     // Start WM run loop V0 to catch events while V1 is warming up.
+    // CRITICAL: Start V0 async and wait for it to begin processing before NSApp loads backend
     dispatch_async(window_manager_q, ^{
       WMRunLoop_V0();
     });
+
+    // Wait for WM event loop V0 to actually start before backend initialization
+    fprintf(stderr, "=== Waiting for WM event loop to start... ===\n");
+    while (!wm_v0_started) {
+      usleep(10000); // Poll every 10ms
+    }
+    fprintf(stderr, "=== WM event loop started! ===\n");
+
     dispatch_async(window_manager_q, ^{
       WMRunLoop_V1();
     });

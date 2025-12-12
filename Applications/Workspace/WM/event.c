@@ -314,11 +314,14 @@ static void _runLoopHandleEvent(CFFileDescriptorRef fdref, CFOptionFlags callBac
   CFFileDescriptorEnableCallBacks(fdref, kCFFileDescriptorReadCallBack);
 }
 
+extern volatile int wm_v0_started;
+
 void WMRunLoop_V0()
 {
   XEvent event;
 
   WMLogError("WMRunLoop_V0: handling events while run loop is warming up.");
+  wm_v0_started = 1;  // Signal that V0 event loop has started
   while (wm_runloop == NULL) {
     WMNextEvent(dpy, &event);
     WMHandleEvent(&event);

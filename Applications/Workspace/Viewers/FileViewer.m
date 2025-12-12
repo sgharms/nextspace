@@ -1016,9 +1016,13 @@
     }
   }
 
+  NSLog(@"TRACE: restoreShelf - isRootViewer=%d, shelfRep=%@, paths=%@", isRootViewer, shelfRep ? @"EXISTS" : @"nil", paths);
+
   if (shelfRep) {
+    NSLog(@"TRACE: reconstructFromRepresentation with %lu items", [shelfRep count]);
     [shelf reconstructFromRepresentation:shelfRep];
   } else {
+    NSLog(@"TRACE: createIconForPaths with paths: %@", paths);
     icon = [shelf createIconForPaths:paths];
     [shelf putIcon:icon intoSlot:NXTMakeIconSlot(0, 0)];
   }

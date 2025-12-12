@@ -1053,10 +1053,12 @@ WDock *wDockCreate(WScreen *scr, int type, const char *name)
       break;
     case WM_DOCK:
     default:
+      WMLogInfo("wDockCreate calling wDockMaxIcons");
       dock->max_icons = wDockMaxIcons(scr);
   }
 
   dock->icon_array = wmalloc(sizeof(WAppIcon *) * dock->max_icons);
+	WMLogInfo("DOCK: Allocating %d max_icons", dock->max_icons);
 
   btn = mainIconCreate(scr, type, name);
   btn->dock = dock;
@@ -1654,16 +1656,27 @@ WDock *wDockRestoreState(WScreen *scr, CFDictionaryRef dock_state, int type)
     CFRelease(tmp);
 
     if (!apps) {
+			WMLogWarning("no aplications detected, loading %p", dApplications);
       apps = CFDictionaryGetValue(dock_state, dApplications);
     }
   }
 
-  if (!apps)
+  if (!apps){
+		WMLogWarning(_("there are too many icons stored in dock. Ignoring what doesn't fit"));
     goto finish;
+	} else {
+		WMLogInfo("Successfully loaded applications");
+  }
 
   count = CFArrayGetCount(apps);
-  if (count == 0)
+  if (count == 0) {
+    CFShow(apps);
+		WMLogCritical("[CRIT] Count was %d", count);
+    abort();
     goto finish;
+  } else {
+		WMLogInfo("Successfully found %d applications", count);
+  }
 
   old_top = dock->icon_array[0];
 
@@ -1732,6 +1745,7 @@ WDock *wDockRestoreState(WScreen *scr, CFDictionaryRef dock_state, int type)
 finish:
   CFRelease(dock_state);
 
+  WMLogInfo("Finishing dock with icon array length of %d and 0th aicon being %p", dock->icon_count, dock->icon_array[0]);
   return dock;
 }
 
@@ -1761,6 +1775,7 @@ void wDockDoAutoLaunch(WDock *dock, int desktop)
   char *command = NULL;
   CFStringRef cmd;
 
+  WMLogInfo("Traversing Dock icons to launch autolaunchables with leading aicon %p and count %d", dock->icon_array[0], dock->icon_count);
   for (int i = 0; i < dock->max_icons; i++) {
     btn = dock->icon_array[i];
     if (!btn || !btn->flags.auto_launch || !btn->command || btn->flags.running ||

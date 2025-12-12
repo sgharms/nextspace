@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Use the Cairo back end. On FreeBSD this is vexingly installing as 'back' instead of 'cairo' - -->
+    <key>GSBackend</key>
+    <string>libgnustep-back</string>
+    <key>NSControlContentFont</key>
+    <string>DejaVuSans</string>
+    <key>NSControlContentFontSize</key>
+    <string>16</string>
+    <key>NSFixedPitchFont</key>
+    <string>DejaVu Sans Mono</string>
+    <key>NSFont</key>
+    <string>DejaVuSans</string>
+    <key>NSFontSize</key>
+    <string>16</string>
+    <key>NSLabelFont</key>
+    <string>DejaVuSans</string>
+    <key>NSLabelFontSize</key>
+    <string>16</string>
+    <key>NSMenuFont</key>
+    <string>DejaVuSans</string>
+    <key>NSMenuFontSize</key>
+    <string>16</string>
+    <key>NSMessageFont</key>
+    <string>DejaVuSans</string>
+    <key>NSMessageFontSize</key>
+    <string>18</string>
+    <key>NSMiniFontSize</key>
+    <string>13</string>
+    <key>NSSmallFontSize</key>
+    <string>14</string>
+    <key>NSToolTipsFont</key>
+    <string>DejaVuSans</string>
+    <key>NSToolTipsFontSize</key>
+    <string>14</string>
+    <key>NSUserFixedPitchFont</key>
+    <!-- This is used in Terminal.app as the default font -->
+    <string>Courier</string>
+    <key>NSUserFixedPitchFontSize</key>
+    <string>14</string>
+    <key>NSUserFont</key>
+    <string>DejaVuSans</string>
+    <key>NSUserFontSize</key>
+    <string>18</string>
+</dict>
+</plist>

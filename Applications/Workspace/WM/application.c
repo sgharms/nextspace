@@ -33,6 +33,10 @@
 #include <core/wevent.h>
 #include <core/wuserdefaults.h>
 
+#ifdef __FreeBSD__
+#include <libgen.h>
+#endif
+
 #include "GNUstep.h"
 #include "WM.h"
 #include "menu.h"

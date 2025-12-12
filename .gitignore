@@ -23,3 +23,13 @@
 *.dir
 *~
 .build
+*.sw?
+Session.vim
+tags
+*.core
+BUILD_ROOT
+.claude/
+CLAUDE.md
+node_modules/
+package-lock.json
+package.json
