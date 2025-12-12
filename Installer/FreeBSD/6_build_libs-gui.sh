@@ -57,8 +57,8 @@ cd Images
 tar zxf ${SOURCES_DIR}/gnustep-gui-images.tar.gz
 
 cd ${BUILD_ROOT}/$(basename $PORT_SOURCE_DIR)
-./configure --with-default-config=/usr/local/Library/Preferences/GNUstep.conf
+./configure --with-default-config=${NEXTSPACE_HOME}/Library/Preferences/GNUstep.conf
 
-$MAKE_CMD -j${CPU_COUNT} install || { echo "Install of gnustep-gui port failed"; exit 1; }
+$MAKE_CMD install debug=yes messages=yes GNUSTEP_INSTALLATION_DOMAIN=SYSTEM -j${CPU_COUNT} || { echo "Install of gnustep-gui port failed"; exit 1; }
 
 echo "Installed $(basename $PORT_SOURCE_DIR)"

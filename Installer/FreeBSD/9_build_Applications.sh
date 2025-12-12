@@ -57,21 +57,21 @@ cd ${APP_BUILD_DIR}
 export CC=${C_COMPILER}
 export CMAKE=${CMAKE_CMD}
 $MAKE_CMD clean
-$MAKE_CMD -j${CPU_COUT} || exit 1
-$INSTALL_CMD || exit
+$MAKE_CMD -j${CPU_COUNT} || exit 1
+$MAKE_CMD install GNUSTEP_INSTALLATION_DOMAIN=SYSTEM || exit
 
-export GNUSTEP_INSTALLATION_DOMAIN=NETWORK
+export GNUSTEP_INSTALLATION_DOMAIN=SYSTEM
 cd ${GORM_BUILD_DIR}
 tar zxf ${SOURCES_DIR}/Libraries/gnustep/gorm-images.tar.gz
 patch -p1 < ${SOURCES_DIR}/Libraries/gnustep/gorm.patch
 $MAKE_CMD
-$INSTALL_CMD || exit
+$MAKE_CMD install || exit
 
 cd ${PC_BUILD_DIR}
 tar zxf ${SOURCES_DIR}/Libraries/gnustep/projectcenter-images.tar.gz
 patch -p1 < ${SOURCES_DIR}/Libraries/gnustep/pc.patch
 $MAKE_CMD
-$INSTALL_CMD || exit
+$MAKE_CMD install || exit
 
   $PRIV_CMD ldconfig -R
 

@@ -44,12 +44,12 @@ cd ${BUILD_DIR}
 	--with-name=art \
 	|| exit 1
 
-$MAKE_CMD -j${CPU_COUT} || exit 1
+$MAKE_CMD -j${CPU_COUNT} || exit 1
 
 #----------------------------------------
 # Install
 #----------------------------------------
-$INSTALL_CMD fonts=no || exit 1
+$MAKE_CMD install fonts=no GNUSTEP_INSTALLATION_DOMAIN=SYSTEM || exit 1
 
 echo "Art backend installed successfully. Skipping Cairo backend build."
 exit 0
@@ -67,9 +67,9 @@ fi
 
 cp -Rf $PORT_SOURCE_DIR ${BUILD_ROOT}/$(basename $PORT_SOURCE_DIR)
 cd ${BUILD_ROOT}/$(basename $PORT_SOURCE_DIR)
-./configure --with-default-config=/usr/local/Library/Preferences/GNUstep.conf
+./configure --with-default-config=${NEXTSPACE_HOME}/Library/Preferences/GNUstep.conf
 
-$MAKE_CMD install || { echo "Install of gnustep-back port failed"; exit 1; }
+$MAKE_CMD install debug=yes messages=yes GNUSTEP_INSTALLATION_DOMAIN=SYSTEM -j${CPU_COUNT} || { echo "Install of gnustep-back port failed"; exit 1; }
 
 echo "Installed $(basename $PORT_SOURCE_DIR)"
 
@@ -82,8 +82,8 @@ ECHO "$(tput sgr0)"
 ECHO "In your rc file, launch the GNUStep PasteBoard Service (gpbs)"
 ECHO "and distributed notifications center (gdnc)"
 ECHO ""
-ECHO "/usr/local/Library/bin/gpbs"
-ECHO "/usr/local/Library/bin/gdnc"
+ECHO "${NEXTSPACE_HOME}/bin/gpbs"
+ECHO "${NEXTSPACE_HOME}/bin/gdnc"
 ECHO ""
 ECHO "Two graphics backends were installed: art (lightweight) and cairo (higher quality)."
 ECHO "To switch between them, use:"
