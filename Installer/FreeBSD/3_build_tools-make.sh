@@ -75,13 +75,14 @@ cp ${CORE_SOURCES}/nextspace-freebsd.fsl $LAYOUTS_DIR/nextspace || exit 1
 sed -i.orig '/post-install:/,/^$/d' Makefile
 
 CONFIGURE_ARGS="\
+  --prefix=/usr/local \
   --with-config-file=/usr/local/Library/Preferences/GNUstep.conf \
   --with-layout=nextspace \
   --enable-native-objc-exceptions \
   --enable-debug-by-default \
   --with-library-combo=ng-gnu-gnu"
 
-CONFIGURE_ENV="PKG_CONFIG_PATH=${NEXTSPACE_HOME}/lib/pkgconfig \
+CONFIGURE_ENV="PKG_CONFIG_PATH=${PKG_CONFIG_PATH} \
   CC=clang \
   CXX=clang++ \
   CFLAGS='${CFLAGS}'"
