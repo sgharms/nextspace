@@ -51,7 +51,11 @@ $MAKE_CMD -j${CPU_COUT} || exit 1
 #----------------------------------------
 $INSTALL_CMD fonts=no || exit 1
 
-echo "Installing additional Cairo-based back end for higher-resolution functions, where beneficial."
+echo "Art backend installed successfully. Skipping Cairo backend build."
+exit 0
+
+# CAIRO BACKEND DISABLED - Focus on art backend only
+# echo "Installing additional Cairo-based back end for higher-resolution functions, where beneficial."
 
 cd $GNUSTEP_BACK_PORT_DIR
 $BSDMAKE_CMD $PORTS_MAKE_ARGS patch
@@ -80,6 +84,12 @@ ECHO "and distributed notifications center (gdnc)"
 ECHO ""
 ECHO "/usr/local/Library/bin/gpbs"
 ECHO "/usr/local/Library/bin/gdnc"
+ECHO ""
+ECHO "Two graphics backends were installed: art (lightweight) and cairo (higher quality)."
+ECHO "To switch between them, use:"
+ECHO ""
+ECHO "  defaults write NSGlobalDomain GSBackend libgnustep-back-art"
+ECHO "  defaults write NSGlobalDomain GSBackend libgnustep-back-cairo"
 ECHO ""
 ECHO "$(tput setaf 3 bold)END TRANSMISSION"
 ECHO "$(tput sgr0)"
