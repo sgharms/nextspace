@@ -72,8 +72,7 @@ export GNUSTEP_INSTALLATION_DOMAIN=SYSTEM
 ## defaults write Terminal TerminalFontSize 24
 # Restore global/system default (if you’d set it before)
 #defaults delete NSGlobalDomain GSBackend
-
-ECHO "$(tput setaf 1 bold)Good news!"
+ECHO "$(tput setaf 2 bold)Good news!"
 ECHO "NextSpace has been installed for FreeBSD."
 ECHO ""
 ECHO "NOTE: Graphical login has not been configured."
