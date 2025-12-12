@@ -14,7 +14,7 @@ NEXTSPACE_HOME="/usr/local/NextSpace"
 # Install package dependencies
 #----------------------------------------
 ECHO ">>> Installing ${OS_ID} packages for GNUstep Base (Foundation) build"
-pkg install -y libxslt gnutls pkgconf || { echo "Could not install dependencies" >&2; exit 1;}
+pkg install -y libxslt libffi gnutls pkgconf || { echo "Could not install dependencies" >&2; exit 1;}
 
 . /usr/local/Developer/Makefiles/GNUstep.sh
 IS_FREEBSD="1"
@@ -28,8 +28,8 @@ EOF
 [ "$PORTS_MAKE_ARGS" ] || PORTS_MAKE_ARGS="DEFAULT_VERSIONS+=ssl=openssl"
 
 SOURCES_DIR=${PROJECT_DIR}/Libraries/gnustep
-  cd $GNUSTEP_BACKEND_PORT_DIR # We should already be there but...
-  PORTS_MAKE_ARGS="DEFAULT_VERSIONS+=ssl=openssl NO_DEPENDS=yes"
+cd $GNUSTEP_BACKEND_PORT_DIR # We should already be there but...
+PORTS_MAKE_ARGS="DEFAULT_VERSIONS+=ssl=openssl NO_DEPENDS=yes"
 $BSDMAKE_CMD $PORTS_MAKE_ARGS patch
 PORT_SOURCE_DIR=$(find . -name gnustep-base\* -type d | head -1)
 if [ -z "$PORT_SOURCE_DIR" ]; then
@@ -37,9 +37,29 @@ if [ -z "$PORT_SOURCE_DIR" ]; then
   exit 1
 fi
 cp -Rf $PORT_SOURCE_DIR ${BUILD_ROOT}/$(basename $PORT_SOURCE_DIR)
+
+# Copy patched NSRunLoop.m with FreeBSD CPU spin fix (before cd into BUILD_ROOT)
+PATCHED_NSRUNLOOP="${CURPWD}/gnustep-base-1.29.0/Source/NSRunLoop.m"
+if [ -f "${PATCHED_NSRUNLOOP}" ]; then
+  cp -f "${PATCHED_NSRUNLOOP}" "${BUILD_ROOT}/$(basename $PORT_SOURCE_DIR)/Source/NSRunLoop.m"
+  echo ">>> Applied NSRunLoop.m CPU spin fix"
+else
+  echo "Warning: Patched NSRunLoop.m not found at ${PATCHED_NSRUNLOOP}" >&2
+fi
+
 cd ${BUILD_ROOT}/$(basename $PORT_SOURCE_DIR)
 
-./configure --with-default-config=${NEXTSPACE_HOME}/Library/Preferences/GNUstep.conf
+export OBJCFLAGS='-fobjc-runtime=gnustep-2.0 -fblocks' \
+		ac_cv_header_bfd_h=no ac_cv_lib_bfd_bfd_openr=no
+
+./configure \
+  --prefix=${NEXTSPACE_HOME} \
+  --with-default-config=${NEXTSPACE_HOME}/Library/Preferences/GNUstep.conf \
+  --disable-procfs \
+  --with-installation-domain=SYSTEM \
+  --with-ffi-include=/usr/local/include \
+  --with-ffi-library=/usr/local/lib
+
 
 # NUCLEAR OPTION: Patch the generated config.h directly since ac_cv_func_* exports didn't work
 # These functions exist in libdispatch.so but configure fails to detect them
@@ -49,7 +69,8 @@ sed -i.bak \
   -e 's|^#undef HAVE__DISPATCH_GET_MAIN_QUEUE_HANDLE_4CF$|#define HAVE__DISPATCH_GET_MAIN_QUEUE_HANDLE_4CF 1|' \
   -e 's|^#undef HAVE__DISPATCH_MAIN_QUEUE_CALLBACK_4CF$|#define HAVE__DISPATCH_MAIN_QUEUE_CALLBACK_4CF 1|' \
   Headers/GNUstepBase/config.h
-$MAKE_CMD install debug=yes messages=yes GNUSTEP_INSTALLATION_DOMAIN=SYSTEM -j12
+
+$MAKE_CMD install debug=yes messages=yes -j12
 
 # Daemons, etc.
 $MKDIR_CMD "${NEXTSPACE_HOME}/etc"

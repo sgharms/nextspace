@@ -15,9 +15,9 @@ rcvar=${name}_enable
 start_cmd="${name}_start"
 stop_cmd="${name}_stop"
 
-GNUSTEP_CONFIG_BINARY="/usr/local/GNUstep/System/Tools/gnustep-config"
+GNUSTEP_CONFIG_BINARY="@GNUSTEP_CONFIG_BINARY@"
 
-GNUSTEP_MAKEFILES="/usr/local/GNUstep/System/Library/Makefiles"
+GNUSTEP_MAKEFILES="@GNUSTEP_MAKEFILES@"
 PIDFILE="/var/run/${name}.pid"
 
 

@@ -61,6 +61,17 @@ $MAKE_CMD -j${CPU_COUNT} || exit 1
 $MAKE_CMD install GNUSTEP_INSTALLATION_DOMAIN=SYSTEM || exit
 
 export GNUSTEP_INSTALLATION_DOMAIN=SYSTEM
+cd ${GORM_BUILD_DIR}
+tar zxf ${SOURCES_DIR}/Libraries/gnustep/gorm-images.tar.gz
+patch -p1 < ${SOURCES_DIR}/Libraries/gnustep/gorm.patch
+$MAKE_CMD
+$MAKE_CMD install || exit
+
+cd ${PC_BUILD_DIR}
+tar zxf ${SOURCES_DIR}/Libraries/gnustep/projectcenter-images.tar.gz
+patch -p1 < ${SOURCES_DIR}/Libraries/gnustep/pc.patch
+$MAKE_CMD
+$MAKE_CMD install || exit
 
   $PRIV_CMD ldconfig -R
 
@@ -72,8 +83,7 @@ export GNUSTEP_INSTALLATION_DOMAIN=SYSTEM
 ## defaults write Terminal TerminalFontSize 24
 # Restore global/system default (if you’d set it before)
 #defaults delete NSGlobalDomain GSBackend
-
-ECHO "$(tput setaf 1 bold)Good news!"
+ECHO "$(tput setaf 2 bold)Good news!"
 ECHO "NextSpace has been installed for FreeBSD."
 ECHO ""
 ECHO "NOTE: Graphical login has not been configured."

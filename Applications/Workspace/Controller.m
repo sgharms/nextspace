@@ -702,8 +702,21 @@ static NSString *WMComputerShouldGoDownNotification = @"WMComputerShouldGoDownNo
   if (appicon && appicon->flags.auto_launch == 1) {
     NSLog(@"DEBUG: Taking auto_launch path, calling mainMenu display");
     [self _restoreWindows];
+#ifndef __FreeBSD__
     [[NSApp mainMenu] display];
     NSLog(@"DEBUG: mainMenu display called, menu=%@", [NSApp mainMenu]);
+#else
+    // FreeBSD: Dispatch menu display asynchronously to avoid blocking on X11 events
+    // The menu display creates X11 windows and waits for confirmation, but X11 events
+    // are processed on the WM event loop thread, causing a deadlock if called synchronously.
+    NSLog(@"DEBUG: FreeBSD: Dispatching mainMenu display asynchronously");
+    dispatch_async(dispatch_get_main_queue(), ^{
+      NSLog(@"DEBUG: FreeBSD: Async block executing - calling mainMenu display");
+      [[NSApp mainMenu] display];
+      NSLog(@"DEBUG: FreeBSD: mainMenu display completed");
+    });
+    NSLog(@"DEBUG: FreeBSD: mainMenu display dispatched, continuing initialization");
+#endif
   } else {
     NSLog(@"DEBUG: Taking delayed activation path, waiting for NSApplicationWillBecomeActiveNotification");
     [nc addObserver:self
@@ -761,7 +774,12 @@ static NSString *WMComputerShouldGoDownNotification = @"WMComputerShouldGoDownNo
                                                 object:NSApp];
   [self _restoreWindows];
   NSLog(@"DEBUG: About to display mainMenu, menu=%@", [NSApp mainMenu]);
+#ifndef __FreeBSD__
   [[NSApp mainMenu] display];
+#else
+  // FreeBSD: Skip explicit menu display call - it hangs waiting for X11 events
+  NSLog(@"DEBUG: FreeBSD: Skipping explicit mainMenu display call");
+#endif
   NSLog(@"DEBUG: mainMenu display completed");
 }
 

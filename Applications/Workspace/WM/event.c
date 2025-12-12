@@ -322,11 +322,16 @@ void WMRunLoop_V0()
 
   WMLogError("WMRunLoop_V0: handling events while run loop is warming up.");
   wm_v0_started = 1;  // Signal that V0 event loop has started
+  int v0_loop_count = 0;
   while (wm_runloop == NULL) {
+    v0_loop_count++;
+    if (v0_loop_count % 1000 == 0) {
+      WMLogError("[V0-SPIN] Looped %d times, wm_runloop still NULL", v0_loop_count);
+    }
     WMNextEvent(dpy, &event);
     WMHandleEvent(&event);
   }
-  WMLogError("WMRunLoop_V0: run loop V1 is ready.");
+  WMLogError("WMRunLoop_V0: exiting after %d iterations", v0_loop_count);
 
 #ifdef HAVE_INOTIFY
   /* Track some defaults files for changes */
