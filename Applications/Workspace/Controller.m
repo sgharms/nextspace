@@ -749,6 +749,8 @@ static NSString *WMComputerShouldGoDownNotification = @"WMComputerShouldGoDownNo
 
   // Recycler
   recycler = [[Recycler alloc] initWithDock:wDefaultScreen()->dock];
+  [RecyclerIcon updatePositionInDock:wDefaultScreen()->dock];
+  [RecyclerIcon syncFrameWithDock:wDefaultScreen()->dock];
   [[recycler appIcon] orderFrontRegardless];
 
   // Show Dock

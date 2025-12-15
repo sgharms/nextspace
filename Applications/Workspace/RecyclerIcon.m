@@ -360,15 +360,51 @@ void _recyclerMouseDown(WObjDescriptor *desc, XEvent *event)
       NSDebugLLog(@"Recycler", @"Recycler detach");
       wDockDetach(dock, rec_icon);
     } else {
+      // Always reattach to ensure position is correct (wDockReattachIcon fixes dock->y_pos)
       if (yindex != new_yindex) {
-        NSDebugLLog(@"Recycler", @"Recycler: reattach");
-        wDockReattachIcon(dock, rec_icon, 0, new_yindex);
+        NSDebugLLog(@"Recycler", @"Recycler: reattach (position changed)");
+      } else {
+        NSDebugLLog(@"Recycler", @"Recycler: reattach (forced sync)");
       }
+      wDockReattachIcon(dock, rec_icon, 0, new_yindex);
     }
   } else if (new_yindex > 0) {
     NSDebugLLog(@"Recycler", @"Recycler: attach at %i", new_yindex);
     wDockAttachIcon(dock, rec_icon, 0, new_yindex, NO);
   }
+}
+
++ (void)syncFrameWithDock:(WDock *)dock
+{
+  WAppIcon *rec_icon = [RecyclerIcon recyclerAppIconForDock:dock];
+  if (!rec_icon || !rec_icon->icon) {
+    return;
+  }
+
+  extern Recycler *recycler;
+  if (!recycler) {
+    return;
+  }
+
+  NSWindow *window = [recycler appIcon];
+  if (!window) {
+    return;
+  }
+
+  // Convert X11 coordinates (top-left origin) to AppKit coordinates (bottom-left origin)
+  WScreen *scr = dock->screen_ptr;
+  WArea usable_area = wGetUsableAreaForHead(scr, scr->xrandr_info.primary_head, NULL, False);
+  int screen_height = usable_area.y2;
+  int window_width = 64;
+  int window_height = 64;
+
+  int appkit_x = rec_icon->x_pos;
+  int appkit_y = screen_height - rec_icon->y_pos - window_height;
+
+  NSRect newFrame = NSMakeRect(appkit_x, appkit_y, window_width, window_height);
+  NSDebugLLog(@"Recycler", @"syncFrameWithDock: X11(%d,%d) -> AppKit(%d,%d)",
+              rec_icon->x_pos, rec_icon->y_pos, appkit_x, appkit_y);
+  [window setFrame:newFrame display:NO];
 }
 
 - (void)_initDefaults
