@@ -70,15 +70,15 @@ sed -i.bak \
   -e 's|^#undef HAVE__DISPATCH_MAIN_QUEUE_CALLBACK_4CF$|#define HAVE__DISPATCH_MAIN_QUEUE_CALLBACK_4CF 1|' \
   Headers/GNUstepBase/config.h
 
-$MAKE_CMD install debug=yes messages=yes -j12
+$MAKE_CMD install debug=yes messages=yes GNUSTEP_INSTALLATION_DOMAIN=SYSTEM -j12
 
 # Daemons, etc.
 $MKDIR_CMD "${NEXTSPACE_HOME}/etc"
 $CP_CMD ${SOURCES_DIR}/gdomap.interfaces "${NEXTSPACE_HOME}/etc"
 
 # Substitute paths in gdomap rc script before installing
-sed -e "s|/usr/local/GNUstep/System/Tools/gnustep-config|${NEXTSPACE_HOME}/bin/gnustep-config|g" \
-    -e "s|/usr/local/GNUstep/System/Library/Makefiles|/usr/local/Developer/Makefiles|g" \
+sed -e "s|@GNUSTEP_CONFIG_BINARY@|${NEXTSPACE_HOME}/bin/gnustep-config|g" \
+    -e "s|@GNUSTEP_MAKEFILES@|/usr/local/Developer/Makefiles|g" \
     ${SOURCES_DIR}/freebsd/gdomap > /usr/local/etc/rc.d/gdomap
 chmod 755 /usr/local/etc/rc.d/gdomap
 
