@@ -38,6 +38,7 @@
 + (WAppIcon *)createAppIconForDock:(WDock *)dock;
 + (WAppIcon *)recyclerAppIconForDock:(WDock *)dock;
 + (void)updatePositionInDock:(WDock *)dock;
++ (void)syncFrameWithDock:(WDock *)dock;
 
 - (id)initWithWindowRef:(void *)X11Window recycler:(Recycler *)theRecycler;
 

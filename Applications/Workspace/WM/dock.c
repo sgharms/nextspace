@@ -1037,6 +1037,15 @@ int wDockMaxIcons(WScreen *scr)
   return head_rect.size.height / wPreferences.icon_size;
 }
 
+static int calculateDockYPos(WDock *dock)
+{
+  WScreen *scr = dock->screen_ptr;
+  WArea usable_area = wGetUsableAreaForHead(scr, scr->xrandr_info.primary_head, NULL, False);
+  int usable_height = usable_area.y2 - usable_area.y1;
+  int max_icons = usable_height / wPreferences.icon_size;
+  return usable_area.y2 - (max_icons * wPreferences.icon_size);
+}
+
 WDock *wDockCreate(WScreen *scr, int type, const char *name)
 {
   WDock *dock;
@@ -1994,11 +2003,19 @@ void wDockReattachIcon(WDock *dock, WAppIcon *icon, int x, int y)
   }
   assert(index < dock->max_icons);
 
+  // FIX: Ensure dock->y_pos is correct for WM_DOCK type
+  if (dock->type == WM_DOCK) {
+    dock->y_pos = calculateDockYPos(dock);
+  }
+
   icon->yindex = y;
   icon->xindex = x;
 
   icon->x_pos = dock->x_pos + x * ICON_SIZE;
   icon->y_pos = dock->y_pos + y * ICON_SIZE;
+
+  // Actually move the window to match the calculated position
+  XMoveWindow(dpy, icon->icon->core->window, icon->x_pos, icon->y_pos);
 
   CFNotificationCenterPostNotification(dock->screen_ptr->notificationCenter,
                                        WMDidChangeDockContentNotification, dock, NULL, TRUE);
