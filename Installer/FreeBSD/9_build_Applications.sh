@@ -33,16 +33,24 @@ fi
 cp -R ${SOURCES_DIR}/Applications ${BUILD_ROOT}
 
 # GORM
-if [ -d ${GORM_BUILD_DIR} ]; then
-	$PRIV_CMD rm -rf ${GORM_BUILD_DIR}
+if [ -z "${SKIP_GORM_PC}" ]; then
+	if [ -d ${GORM_BUILD_DIR} ]; then
+		$PRIV_CMD rm -rf ${GORM_BUILD_DIR}
+	fi
+	git_remote_archive https://github.com/gnustep/apps-gorm ${GORM_BUILD_DIR} gorm-${gorm_version}
+else
+	ECHO ">>> Skipping GORM download (SKIP_GORM_PC is set)"
 fi
-git_remote_archive https://github.com/gnustep/apps-gorm ${GORM_BUILD_DIR} gorm-${gorm_version}
 
 # ProjectCenter
-if [ -d ${PC_BUILD_DIR} ]; then
-	$PRIV_CMD rm -rf ${PC_BUILD_DIR}
+if [ -z "${SKIP_GORM_PC}" ]; then
+	if [ -d ${PC_BUILD_DIR} ]; then
+		$PRIV_CMD rm -rf ${PC_BUILD_DIR}
+	fi
+	git_remote_archive https://github.com/gnustep/apps-projectcenter ${PC_BUILD_DIR} projectcenter-${projectcenter_version}
+else
+	ECHO ">>> Skipping ProjectCenter download (SKIP_GORM_PC is set)"
 fi
-git_remote_archive https://github.com/gnustep/apps-projectcenter ${PC_BUILD_DIR} projectcenter-${projectcenter_version}
 
 #----------------------------------------
 # Build
@@ -61,17 +69,25 @@ $MAKE_CMD -j${CPU_COUNT} || exit 1
 $MAKE_CMD install GNUSTEP_INSTALLATION_DOMAIN=SYSTEM || exit
 
 export GNUSTEP_INSTALLATION_DOMAIN=SYSTEM
-cd ${GORM_BUILD_DIR}
-tar zxf ${SOURCES_DIR}/Libraries/gnustep/gorm-images.tar.gz
-patch -p1 < ${SOURCES_DIR}/Libraries/gnustep/gorm.patch
-$MAKE_CMD
-$MAKE_CMD install || exit
+if [ -z "${SKIP_GORM_PC}" ]; then
+	cd ${GORM_BUILD_DIR}
+	tar zxf ${SOURCES_DIR}/Libraries/gnustep/gorm-images.tar.gz
+	patch -p1 < ${SOURCES_DIR}/Libraries/gnustep/gorm.patch
+	$MAKE_CMD
+	$MAKE_CMD install || exit
+else
+	ECHO ">>> Skipping GORM build/install (SKIP_GORM_PC is set)"
+fi
 
-cd ${PC_BUILD_DIR}
-tar zxf ${SOURCES_DIR}/Libraries/gnustep/projectcenter-images.tar.gz
-patch -p1 < ${SOURCES_DIR}/Libraries/gnustep/pc.patch
-$MAKE_CMD
-$MAKE_CMD install || exit
+if [ -z "${SKIP_GORM_PC}" ]; then
+	cd ${PC_BUILD_DIR}
+	tar zxf ${SOURCES_DIR}/Libraries/gnustep/projectcenter-images.tar.gz
+	patch -p1 < ${SOURCES_DIR}/Libraries/gnustep/pc.patch
+	$MAKE_CMD
+	$MAKE_CMD install || exit
+else
+	ECHO ">>> Skipping ProjectCenter build/install (SKIP_GORM_PC is set)"
+fi
 
   $PRIV_CMD ldconfig -R
 
