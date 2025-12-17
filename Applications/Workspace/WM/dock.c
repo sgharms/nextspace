@@ -1043,7 +1043,10 @@ static int calculateDockYPos(WDock *dock)
   WArea usable_area = wGetUsableAreaForHead(scr, scr->xrandr_info.primary_head, NULL, False);
   int usable_height = usable_area.y2 - usable_area.y1;
   int max_icons = usable_height / wPreferences.icon_size;
-  return usable_area.y2 - (max_icons * wPreferences.icon_size);
+  int result = usable_area.y2 - (max_icons * wPreferences.icon_size);
+  WMLogInfo("calculateDockYPos: usable_area.y2=%d, max_icons=%d, result=%d",
+            usable_area.y2, max_icons, result);
+  return result;
 }
 
 WDock *wDockCreate(WScreen *scr, int type, const char *name)
@@ -1703,11 +1706,20 @@ WDock *wDockRestoreState(WScreen *scr, CFDictionaryRef dock_state, int type)
     }
 
     value = CFArrayGetValueAtIndex(apps, i);
+
+    // Log what application we're trying to restore
+    CFStringRef name_value = CFDictionaryGetValue((CFDictionaryRef)value, dName);
+    const char *app_name = name_value ? CFStringGetCStringPtr(name_value, kCFStringEncodingUTF8) : "Unknown";
+    WMLogInfo("Restoring dock icon %d: %s", i, app_name);
+
     aicon = _dockRestoreIconState(scr, (CFDictionaryRef)value, type, dock->icon_count);
 
     dock->icon_array[dock->icon_count] = aicon;
 
     if (aicon) {
+      WMLogInfo("Successfully restored icon %d: %s at position (%d,%d), dock_pos=(%d,%d)",
+                i, app_name, aicon->xindex, aicon->yindex,
+                dock->x_pos, dock->y_pos);
       aicon->dock = dock;
       aicon->x_pos = dock->x_pos + (aicon->xindex * ICON_SIZE);
       aicon->y_pos = dock->y_pos + (aicon->yindex * ICON_SIZE);
@@ -1719,8 +1731,11 @@ WDock *wDockRestoreState(WScreen *scr, CFDictionaryRef dock_state, int type)
       }
       wCoreConfigure(aicon->icon->core, aicon->x_pos, aicon->y_pos, 0, 0);
       dock->icon_count++;
-    } else if (dock->icon_count == 0 && type == WM_DOCK) {
-      dock->icon_count++;
+    } else {
+      WMLogWarning("Failed to restore icon %d: %s (returned NULL)", i, app_name);
+      if (dock->icon_count == 0 && type == WM_DOCK) {
+        dock->icon_count++;
+      }
     }
   }
 
@@ -2003,9 +2018,19 @@ void wDockReattachIcon(WDock *dock, WAppIcon *icon, int x, int y)
   }
   assert(index < dock->max_icons);
 
+  // Log icon name and current position
+  char *icon_name = icon->wm_class ? icon->wm_class : (icon->wm_instance ? icon->wm_instance : "Unknown");
+  WMLogInfo("wDockReattachIcon: icon=%s, old_idx=(%d,%d), new_idx=(%d,%d)",
+            icon_name, icon->xindex, icon->yindex, x, y);
+
   // FIX: Ensure dock->y_pos is correct for WM_DOCK type
+  int old_dock_y_pos = dock->y_pos;
   if (dock->type == WM_DOCK) {
     dock->y_pos = calculateDockYPos(dock);
+    if (old_dock_y_pos != dock->y_pos) {
+      WMLogInfo("wDockReattachIcon: dock->y_pos changed from %d to %d for icon %s",
+                old_dock_y_pos, dock->y_pos, icon_name);
+    }
   }
 
   icon->yindex = y;
@@ -2013,6 +2038,9 @@ void wDockReattachIcon(WDock *dock, WAppIcon *icon, int x, int y)
 
   icon->x_pos = dock->x_pos + x * ICON_SIZE;
   icon->y_pos = dock->y_pos + y * ICON_SIZE;
+
+  WMLogInfo("wDockReattachIcon: icon=%s, final_pos=(%d,%d), window=0x%lx",
+            icon_name, icon->x_pos, icon->y_pos, icon->icon->core->window);
 
   // Actually move the window to match the calculated position
   XMoveWindow(dpy, icon->icon->core->window, icon->x_pos, icon->y_pos);
