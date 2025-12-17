@@ -1079,6 +1079,12 @@ WDock *wDockCreate(WScreen *scr, int type, const char *name)
   dock->y_pos = btn->y_pos;
   dock->screen_ptr = scr;
   dock->type = type;
+
+  // FIX: Calculate correct y_pos for WM_DOCK type (after screen_ptr is set!)
+  if (type == WM_DOCK) {
+    dock->y_pos = calculateDockYPos(dock);
+    WMLogInfo("wDockCreate: Initialized dock->y_pos=%d for WM_DOCK", dock->y_pos);
+  }
   dock->icon_count = 1;
   if (type == WM_DRAWER)
     dock->on_right_side = scr->dock->on_right_side;
@@ -1591,6 +1597,16 @@ WDock *wDockRestoreState(WScreen *scr, CFDictionaryRef dock_state, int type)
     }
   }
 
+  // FIX: Validate and correct dock->y_pos for WM_DOCK after restoration
+  if (type == WM_DOCK) {
+    int correct_y_pos = calculateDockYPos(dock);
+    if (dock->y_pos != correct_y_pos) {
+      WMLogInfo("wDockRestoreState: Correcting dock->y_pos from %d to %d",
+                dock->y_pos, correct_y_pos);
+      dock->y_pos = correct_y_pos;
+    }
+  }
+
   /* restore lowered/raised state */
   dock->lowered = 0;
   value = CFDictionaryGetValue(dock_state, dLowered);
@@ -2023,15 +2039,7 @@ void wDockReattachIcon(WDock *dock, WAppIcon *icon, int x, int y)
   WMLogInfo("wDockReattachIcon: icon=%s, old_idx=(%d,%d), new_idx=(%d,%d)",
             icon_name, icon->xindex, icon->yindex, x, y);
 
-  // FIX: Ensure dock->y_pos is correct for WM_DOCK type
-  int old_dock_y_pos = dock->y_pos;
-  if (dock->type == WM_DOCK) {
-    dock->y_pos = calculateDockYPos(dock);
-    if (old_dock_y_pos != dock->y_pos) {
-      WMLogInfo("wDockReattachIcon: dock->y_pos changed from %d to %d for icon %s",
-                old_dock_y_pos, dock->y_pos, icon_name);
-    }
-  }
+  // dock->y_pos is now correctly initialized in wDockCreate/wDockRestoreState
 
   icon->yindex = y;
   icon->xindex = x;

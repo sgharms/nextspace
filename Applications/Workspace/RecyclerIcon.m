@@ -360,7 +360,7 @@ void _recyclerMouseDown(WObjDescriptor *desc, XEvent *event)
       NSDebugLLog(@"Recycler", @"Recycler detach");
       wDockDetach(dock, rec_icon);
     } else {
-      // Always reattach to ensure position is correct (wDockReattachIcon fixes dock->y_pos)
+      // Always reattach to ensure position is correct (dock->y_pos is now fixed at initialization)
       if (yindex != new_yindex) {
         NSDebugLLog(@"Recycler", @"Recycler: reattach (position changed)");
       } else {
