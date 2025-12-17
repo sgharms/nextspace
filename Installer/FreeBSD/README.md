@@ -533,6 +533,35 @@ After restarting Workspace, test with readline shortcuts (Control+P for previous
 
 After editing, restart Workspace for changes to take effect.
 
+### Faster Builds: Skipping GORM and ProjectCenter
+
+**Problem**: Building all applications with `9_build_Applications.sh` is slow, especially when you only need to rebuild Workspace.
+
+**Solution**:
+
+Use the `SKIP_GORM_PC` environment variable to skip building GORM and ProjectCenter:
+
+```sh
+# If using doas (FreeBSD standard)
+doas env SKIP_GORM_PC=1 ./9_build_Applications.sh
+
+# If using sudo (Linux)
+sudo SKIP_GORM_PC=1 ./9_build_Applications.sh
+
+# Or export it first
+export SKIP_GORM_PC=1
+doas -E ./9_build_Applications.sh
+```
+
+This significantly reduces build time by only building Workspace and the essential system applications, skipping the developer tools (GORM and ProjectCenter).
+
+**When to use this**:
+- During iterative development/debugging of Workspace
+- When you don't need the IDE tools
+- When doing quick rebuilds after code changes
+
+**Note**: You'll still get a fully functional NextSpace desktop environment; you just won't have the visual interface builder (GORM) or IDE (ProjectCenter).
+
 [GNUmake]: https://www.gnu.org/software/make/manual/make.html
 [FBSDHBJail]: https://docs.freebsd.org/en/books/handbook/jails/
 [NEXTSPACE]: https://github.com/trunkmaster/nextspace/
