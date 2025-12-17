@@ -459,6 +459,80 @@ around sound support is in here as well (that's also where it could be fixed
 
 Here's a nice makefile to instal the applications. Yay!
 
+## FAQ: Troubleshooting
+
+### Alt-Tab Window Switching Not Working
+
+**Problem**: Pressing Alt+Tab doesn't show the application switcher panel.
+
+**Root Causes**:
+1. Wrong key binding names in WM.plist configuration
+2. Using unsupported modifier names like "Mod1" instead of "Alt"
+
+**Solution**:
+
+Edit `~/Library/Preferences/.NextSpace/WM.plist` and verify these settings:
+
+```xml
+<key>GroupNextKey</key>
+<string>Alt+Tab</string>
+<key>GroupPrevKey</key>
+<string>Alt+Shift+Tab</string>
+```
+
+**Common Mistakes**:
+- Using `FocusNextKey` instead of `GroupNextKey` (cycles windows within app, not between apps)
+- Using "Mod1" instead of "Alt" (Mod1/Mod2/etc are not recognized by the keyboard parser)
+
+**Key Binding Reference**:
+- `GroupNextKey`/`GroupPrevKey` - Switch between applications (Alt-Tab behavior)
+- `FocusNextKey`/`FocusPrevKey` - Switch between windows of same application
+- Supported modifier names: Alt, Control, Shift, Super, Command, Hyper
+- Unsupported: Mod1, Mod2, Mod3, Mod4, Mod5 (use semantic names instead)
+
+After editing, restart Workspace for changes to take effect.
+
+### Caps Lock as Control Not Working
+
+**Problem**: Want Caps Lock to function as Control key (common ergonomic preference).
+
+**Root Cause**: Incorrect XKB option in NXGlobalDomain configuration. The default `"caps:ctrl_modifier"` makes Caps Lock act as both Caps Lock and Control, not just Control.
+
+**Solution**:
+
+Edit `~/Library/Preferences/.NextSpace/NXGlobalDomain` and change the keyboard option:
+
+**Change from**:
+```
+KeyboardOptions = (
+    "kpdl:dot",
+    "numpad:mac",
+    "caps:ctrl_modifier",     // Wrong - acts as both Caps and Ctrl
+    "grp:win_space_toggle"
+);
+```
+
+**Change to**:
+```
+KeyboardOptions = (
+    "kpdl:dot",
+    "numpad:mac",
+    "ctrl:nocaps",            // Correct - Caps Lock acts as Control only
+    "grp:win_space_toggle"
+);
+```
+
+**Alternative XKB Options**:
+- `"ctrl:nocaps"` - Caps Lock as Control (recommended)
+- `"ctrl:swapcaps"` - Swap Caps Lock and Control positions
+- `"caps:escape"` - Caps Lock as ESC (popular with Vim users)
+- `"caps:none"` - Disable Caps Lock completely
+
+**Testing**:
+After restarting Workspace, test with readline shortcuts (Control+P for previous line, Control+N for next line, etc.). Note that in GNUstep/NextSpace, copy/paste uses Command (Alt), not Control.
+
+After editing, restart Workspace for changes to take effect.
+
 [GNUmake]: https://www.gnu.org/software/make/manual/make.html
 [FBSDHBJail]: https://docs.freebsd.org/en/books/handbook/jails/
 [NEXTSPACE]: https://github.com/trunkmaster/nextspace/
