@@ -345,13 +345,20 @@ void _recyclerMouseDown(WObjDescriptor *desc, XEvent *event)
   WAppIcon *rec_icon = [RecyclerIcon recyclerAppIconForDock:dock];
   int yindex, new_yindex, max_position;
 
+  NSLog(@"RecyclerIcon updatePositionInDock: ENTRY - dock=%p, dock->y_pos=%d, dock->type=%d",
+        dock, dock->y_pos, dock->type);
+
   yindex = rec_icon->yindex;
   // 1. Screen dimensions may have changed - rebuild Dock.
   //    If main display height reduced - Recycler will be removed from Dock.
   [RecyclerIcon rebuildDock:dock];
 
+  NSLog(@"RecyclerIcon updatePositionInDock: After rebuildDock - dock->y_pos=%d", dock->y_pos);
+
   // 2. Get new position for Recycler.
   new_yindex = [RecyclerIcon newPositionInDock:dock];
+
+  NSLog(@"RecyclerIcon updatePositionInDock: old_yindex=%d, new_yindex=%d", yindex, new_yindex);
 
   // 3. Place Recycler to the new position if Dock has room.
   if (rec_icon->flags.docked) {
@@ -360,13 +367,23 @@ void _recyclerMouseDown(WObjDescriptor *desc, XEvent *event)
       NSDebugLLog(@"Recycler", @"Recycler detach");
       wDockDetach(dock, rec_icon);
     } else {
-      // Always reattach to ensure position is correct (dock->y_pos is now fixed at initialization)
+      // Always reattach to ensure position is correct
+      NSLog(@"RecyclerIcon updatePositionInDock: BEFORE wDockReattachIcon - dock->y_pos=%d", dock->y_pos);
       if (yindex != new_yindex) {
         NSDebugLLog(@"Recycler", @"Recycler: reattach (position changed)");
       } else {
         NSDebugLLog(@"Recycler", @"Recycler: reattach (forced sync)");
       }
       wDockReattachIcon(dock, rec_icon, 0, new_yindex);
+      NSLog(@"RecyclerIcon updatePositionInDock: AFTER wDockReattachIcon - dock->y_pos=%d", dock->y_pos);
+
+      // FIX: Add offset to Recycler Y position to place it flush with bottom
+      // calculateDockYPos returns the Y offset needed to fit max_icons within usable area
+      int dock_offset = calculateDockYPos(dock);
+      rec_icon->y_pos += dock_offset;
+      XMoveWindow(dpy, rec_icon->icon->core->window, rec_icon->x_pos, rec_icon->y_pos);
+      NSLog(@"RecyclerIcon updatePositionInDock: Applied dock_offset=%d, final y_pos=%d",
+            dock_offset, rec_icon->y_pos);
     }
   } else if (new_yindex > 0) {
     NSDebugLLog(@"Recycler", @"Recycler: attach at %i", new_yindex);

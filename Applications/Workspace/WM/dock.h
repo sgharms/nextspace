@@ -75,6 +75,7 @@ typedef struct WDock {
 } WDock;
 
 int wDockMaxIcons(WScreen *scr);
+int calculateDockYPos(WDock *dock);
 WDock *wDockCreate(WScreen *scr, int type, const char *name);
 WDock *wDockRestoreState(WScreen *scr, CFDictionaryRef dock_state, int type);
 

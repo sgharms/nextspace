@@ -1037,7 +1037,7 @@ int wDockMaxIcons(WScreen *scr)
   return head_rect.size.height / wPreferences.icon_size;
 }
 
-static int calculateDockYPos(WDock *dock)
+int calculateDockYPos(WDock *dock)
 {
   WScreen *scr = dock->screen_ptr;
   WArea usable_area = wGetUsableAreaForHead(scr, scr->xrandr_info.primary_head, NULL, False);
@@ -1079,12 +1079,6 @@ WDock *wDockCreate(WScreen *scr, int type, const char *name)
   dock->y_pos = btn->y_pos;
   dock->screen_ptr = scr;
   dock->type = type;
-
-  // FIX: Calculate correct y_pos for WM_DOCK type (after screen_ptr is set!)
-  if (type == WM_DOCK) {
-    dock->y_pos = calculateDockYPos(dock);
-    WMLogInfo("wDockCreate: Initialized dock->y_pos=%d for WM_DOCK", dock->y_pos);
-  }
   dock->icon_count = 1;
   if (type == WM_DRAWER)
     dock->on_right_side = scr->dock->on_right_side;
@@ -1568,14 +1562,16 @@ WDock *wDockRestoreState(WScreen *scr, CFDictionaryRef dock_state, int type)
     if (CFGetTypeID(value) != CFStringGetTypeID()) {
       COMPLAIN("Position");
     } else {
-      if (sscanf(CFStringGetCStringPtr(value, kCFStringEncodingUTF8), "%i,%i", &dock->x_pos,
-                 &dock->y_pos) != 2)
+      if (sscanf(CFStringGetCStringPtr(value, kCFStringEncodingUTF8), "%i,%i", &dock->x_pos, &dock->y_pos) != 2)
         COMPLAIN("Position");
 
       /* check position sanity */
       if (!onScreen(scr, dock->x_pos, dock->y_pos)) {
         int x = dock->x_pos;
+        int old_y = dock->y_pos;
         wScreenKeepInside(scr, &x, &dock->y_pos, ICON_SIZE, ICON_SIZE);
+        WMLogInfo("wDockRestoreState: Position off-screen, adjusted y_pos from %d to %d",
+                  old_y, dock->y_pos);
       }
 
       /* Is this needed any more? */
@@ -1594,16 +1590,6 @@ WDock *wDockRestoreState(WScreen *scr, CFDictionaryRef dock_state, int type)
           dock->on_right_side = 1;
         }
       }
-    }
-  }
-
-  // FIX: Validate and correct dock->y_pos for WM_DOCK after restoration
-  if (type == WM_DOCK) {
-    int correct_y_pos = calculateDockYPos(dock);
-    if (dock->y_pos != correct_y_pos) {
-      WMLogInfo("wDockRestoreState: Correcting dock->y_pos from %d to %d",
-                dock->y_pos, correct_y_pos);
-      dock->y_pos = correct_y_pos;
     }
   }
 
@@ -2040,6 +2026,8 @@ void wDockReattachIcon(WDock *dock, WAppIcon *icon, int x, int y)
             icon_name, icon->xindex, icon->yindex, x, y);
 
   // dock->y_pos is now correctly initialized in wDockCreate/wDockRestoreState
+  WMLogInfo("wDockReattachIcon: BEFORE calculation - dock=%p, dock->y_pos=%d, dock->type=%d",
+            dock, dock->y_pos, dock->type);
 
   icon->yindex = y;
   icon->xindex = x;
@@ -2047,6 +2035,10 @@ void wDockReattachIcon(WDock *dock, WAppIcon *icon, int x, int y)
   icon->x_pos = dock->x_pos + x * ICON_SIZE;
   icon->y_pos = dock->y_pos + y * ICON_SIZE;
 
+  WMLogInfo("wDockReattachIcon: CALCULATION - dock->x_pos=%d, x=%d, ICON_SIZE=%d -> icon->x_pos=%d",
+            dock->x_pos, x, ICON_SIZE, icon->x_pos);
+  WMLogInfo("wDockReattachIcon: CALCULATION - dock->y_pos=%d, y=%d, ICON_SIZE=%d -> icon->y_pos=%d",
+            dock->y_pos, y, ICON_SIZE, icon->y_pos);
   WMLogInfo("wDockReattachIcon: icon=%s, final_pos=(%d,%d), window=0x%lx",
             icon_name, icon->x_pos, icon->y_pos, icon->icon->core->window);
 
