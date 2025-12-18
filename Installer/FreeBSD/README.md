@@ -17,9 +17,8 @@
 2. Sound controls
 3. Display aware resizing and cleverness based on hot plug/unplug of
    peripherals
-4. Uninstaller script (Do you know how hard it was to get this working ;))
-5. Power-inefficient: Starting this up cranks my fan. Might be this machine or
-   14.3 FreeBSD. Needs investigation
+4. ~~Uninstaller script (Do you know how hard it was to get this working ;))~~ -- _Everything's in `/usr/local/NextSpace`
+5. ~~Power-inefficient: Starting this up cranks my fan. Might be this machine or 14.3 FreeBSD. Needs investigation~~ -- see `c6a4247`
 
 ## Low-Priority Goals
 
@@ -290,6 +289,13 @@ should work. If things break look at the executing terminal or double-check
 `~/Library/Preferences/.NextSpace/WMState.plist`
 
 _Inconsistently_ my first run would crash. Re-running seemed to fix things.
+
+## Configuration
+
+### Terminal.app
+
+1. If `Terminal AlternateAsMeta YES` and `Terminal PreserveReadlineWordMovement YES`, you will get your alt+f/b to work as GNU readline (word-forward/backward)
+`
 
 ## Issues
 
