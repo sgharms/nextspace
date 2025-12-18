@@ -465,6 +465,112 @@ around sound support is in here as well (that's also where it could be fixed
 
 Here's a nice makefile to instal the applications. Yay!
 
+## Workarounds
+
+### Adding Applications to the Dock
+
+**Problem**: The Workspace dock saves its state on exit, which means editing `WMState.plist` while Workspace is running will be overwritten.
+
+**Root Cause**: Workspace loads dock state from `WMState.plist` on startup and keeps it in memory. When Workspace exits, it writes this in-memory state back to the file, overwriting any external changes made while it was running.
+
+**Solution**: Edit the plist file while Workspace is stopped.
+
+#### Procedure
+
+1. **Stop Workspace completely** (quit the application)
+
+2. **Edit the dock configuration** in `~/Library/Preferences/.NextSpace/WMState.plist`
+
+   Add your application entries to both the `Applications` and `Applications1080` arrays (or the appropriate resolution-specific array). Insert them between existing applications and the Recycler entry.
+
+3. **Optionally add icon metadata** to `~/Library/Preferences/.NextSpace/WMWindowAttributes.plist`
+
+   This specifies the icon file path for the application.
+
+4. **Start Workspace** - your applications will now appear in the dock
+
+#### Example Entry Format
+
+For a GNUstep application like Gorm:
+
+```xml
+<dict>
+    <key>AutoLaunch</key>
+    <string>No</string>
+    <key>BuggyApplication</key>
+    <string>No</string>
+    <key>Command</key>
+    <string>/usr/local/NextSpace/Apps/Gorm.app/Gorm</string>
+    <key>Forced</key>
+    <string>No</string>
+    <key>Lock</key>
+    <string>No</string>
+    <key>Name</key>
+    <string>Gorm.GNUstep</string>
+    <key>Position</key>
+    <string>0,6</string>
+</dict>
+```
+
+For a non-GNUstep X11 application like LibreWolf:
+
+```xml
+<dict>
+    <key>AutoLaunch</key>
+    <string>No</string>
+    <key>BuggyApplication</key>
+    <string>No</string>
+    <key>Command</key>
+    <string>/home/username/bin/librewolf</string>
+    <key>Forced</key>
+    <string>No</string>
+    <key>Lock</key>
+    <string>No</string>
+    <key>Name</key>
+    <string>librewolf.Librewolf</string>
+    <key>Position</key>
+    <string>0,5</string>
+</dict>
+```
+
+#### Key Requirements
+
+- **Name field format:**
+  - GNUstep apps: `AppName.GNUstep` (e.g., `Gorm.GNUstep`, `ProjectCenter.GNUstep`)
+  - X11 apps: `instance.ClassName` (e.g., `librewolf.Librewolf`, `xterm.XTerm`)
+  - The name must parse into instance and class components separated by a dot
+
+- **Command field:** Full path to the executable
+
+- **Position field:** `0,Y` where Y is the vertical slot in the dock (0 is top, increase downward)
+
+- **Icon metadata (optional):** Add to `WMWindowAttributes.plist`:
+  ```xml
+  <key>Gorm.GNUstep</key>
+  <dict>
+      <key>Icon</key>
+      <string>/usr/local/NextSpace/Apps/Gorm.app/Resources/Gorm.tiff</string>
+  </dict>
+  ```
+
+#### Why Editing While Running Doesn't Work
+
+The dock state lifecycle:
+1. Workspace starts and loads WMState.plist into memory
+2. All dock operations work with the in-memory state
+3. On exit, Workspace serializes the in-memory state back to WMState.plist
+4. Any external edits made while running are overwritten
+
+This is why drag-and-drop in the GUI is the intended method - it modifies the in-memory state which then gets persisted correctly. This manual approach works when GUI features are unavailable.
+
+#### Backup Recommendation
+
+Before editing, backup your configuration:
+```sh
+cp ~/Library/Preferences/.NextSpace/WMState.plist ~/Library/Preferences/.NextSpace/WMState.plist.backup
+cp ~/Library/Preferences/.NextSpace/WMWindowAttributes.plist ~/Library/Preferences/.NextSpace/WMWindowAttributes.plist.backup
+```
+
 ## FAQ: Troubleshooting
 
 ### Alt-Tab Window Switching Not Working
