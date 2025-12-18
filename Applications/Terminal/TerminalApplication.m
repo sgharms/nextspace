@@ -45,8 +45,10 @@
           unichar c = [[e characters] characterAtIndex:0];
           NSDebugLLog(@"key", @"Saw %hu", c);
 
-          // Preserve readline-esque Meta+f and Meta+b for whole-word operations
-          if ((c == 'f' || c == 'b') && !([e modifierFlags] & NSShiftKeyMask))
+          // Preserve readline-esque word operations:
+          //   Alt+f/b: word forward/backward movement
+          //   Alt+d: delete word forward
+          if ((c == 'f' || c == 'b' || c == 'd') && !([e modifierFlags] & NSShiftKeyMask))
           {
             NSString *metaSeq = [NSString stringWithFormat:@"\033%c", c];
 
@@ -63,7 +65,29 @@
                                 keyCode:[e keyCode]];
 
             [super sendEvent:escEvent];
-            return; // swallow original Alt+f / Alt+b
+            return;
+            }
+
+          // Alt+Backspace: delete word backward
+          // Backspace sends DEL (127) or BS (8) depending on terminal settings
+          if (c == 127 || c == 8)
+          {
+            NSString *metaSeq = @"\033\177";
+
+            NSEvent *escEvent =
+              [NSEvent keyEventWithType:NSKeyDown
+                               location:[e locationInWindow]
+                          modifierFlags:0
+                              timestamp:[e timestamp]
+                           windowNumber:[e windowNumber]
+                                context:[e context]
+                             characters:metaSeq
+            charactersIgnoringModifiers:metaSeq
+                              isARepeat:[e isARepeat]
+                                keyCode:[e keyCode]];
+
+            [super sendEvent:escEvent];
+            return;
             }
           }
           else // char length > 1
