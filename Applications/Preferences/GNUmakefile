@@ -21,12 +21,13 @@ SUBPROJECTS = \
 	Modules/Screen \
 	Modules/Keyboard \
 	Modules/Mouse \
-#	Modules/Sound \
 	Modules/Services \
-	Modules/Expert
-#	Modules/Menu \
-#	Modules/Password \
-#	Modules/Power
+	Modules/Expert \
+	Modules/Menu \
+	Modules/Password \
+	Modules/Power
+# Disabled on FreeBSD due to Pulse dependency
+# Modules/Sound
 
 #
 # Resource files
